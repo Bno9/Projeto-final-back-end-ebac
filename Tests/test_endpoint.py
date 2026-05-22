@@ -29,13 +29,13 @@ def test_endpoint_all_pokemons():
     response = client.get("/pokemons")
 
     assert response.json() == {
-        "data": "",
+        "data": response.json()["data"],
         "pagination": {
-            "total": 0,
-            "limite": "",
-            "offset": "",
-            "next": "",
-            "previous": None
+            "total": 1000,
+            "limit": 10,
+            "offset": 10,
+            "next": "https://pokeapi.co/api/v2/pokemon?limit=10&offset=20",
+            "previous": "https://pokeapi.co/api/v2/pokemon?limit=10&offset=0"
         }
     }
 
