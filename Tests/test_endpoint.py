@@ -4,21 +4,21 @@ from app.main import app
 
 client = TestClient(app)
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def charmander():
     """
-    Fixture para criar um pokemon charmander (usando só de modelo para lembrar o que deve ser retornado pela pokeapi.co)
+    Fixture para criar um pokemon charmander (id 4) para ser usado nos testes, usando os dados da pokeapi.co
     """
     return {
         "name": "charmander",
         "id": 4,
-        "height": 0.6,
-        "weight": 8.5,
+        "height": 6,
+        "weight": 85,
         "types": ["fire"],
-        "level": 5,
+        "level": 3,
         "sprites": {
-            "front_default": "",
-            "back_default": "",
+            "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png",
+            "back_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/4.png",
         }
     }
 
@@ -41,21 +41,21 @@ def test_endpoint_all_pokemons():
 
     assert response.status_code == 200
 
-def test_endpoint_pokemon_por_id():
+def test_endpoint_pokemon_por_id(charmander):
     """
     endpoint /pokemons/{id} deve retornar um json de pokemons da pokeapi.co
     """
-    response = client.get("/pokemons/1")
+
+    response = client.get(f"/pokemons/{charmander['id']}")
 
     assert response.json() == {
-        "data": "",
-        "pagination": {
-            "total": 0,
-            "limite": "",
-            "offset": "",
-            "next": "",
-            "previous": None
+        "name": charmander["name"],
+        "id": charmander["id"],
+        "height": charmander["height"],
+        "weight": charmander["weight"],
+        "types": charmander["types"],
+        "level": charmander["level"],
+        "sprites": charmander["sprites"]
         }
-    }
 
     assert response.status_code == 200
