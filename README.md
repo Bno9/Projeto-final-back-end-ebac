@@ -34,7 +34,6 @@ Documente os endpoints utilizando os recursos nativos do FastAPI.
 Configure corretamente as variáveis de ambiente.
 
 
-
 # Planejamento
 
 Minha ideia inicial é desenvolver a aplicação utilizando a metodologia TDD para diminuir a quantidade de erros e dor de cabeça ao longo do desenvolvimento, além de já garantir o requisito dos testes unitários. Não pretendo criar endpoints além dos que foram pedidos, mas colocarei autenticação em todos, mesmo que não seja necessário, para reforçar essa prática. Também realizarei commits pequenos para manter uma boa legibilidade e deixar clara cada alteração feita. Após a finalização da aplicação, criarei o Dockerfile e o docker-compose.yml.
