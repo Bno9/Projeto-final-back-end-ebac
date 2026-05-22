@@ -10,11 +10,12 @@ app = FastAPI()
 def get_pokemons(limit: int = 10, offset: int = 0) -> dict:
     response = requests.get(f"https://pokeapi.co/api/v2/pokemon?limit={limit}&offset={offset}")
     data = response.json()
+    
     return {
         "data": data,
         "pagination": {
             "total": 0,
-            "limite": "",
+            "limit": "",
             "offset": "",
             "next": "",
             "previous": None
@@ -32,10 +33,11 @@ def get_pokemon_by_id(id: int) -> dict:
     sprites = data["sprites"]
     back_default, front_default = sprites["back_default"], sprites["front_default"]
 
-    level = data["base_experience"] // 20 #fiz um sistema defaul que o pokemon upa 1 nivel a cada 20 de base_experience, mas isso é só um exemplo, pode ser qualquer coisa
+    level = data["base_experience"] // 20 #fiz um sistema default que o pokemon upa 1 nivel a cada 20 de base_experience, mas isso é só um exemplo, pode ser qualquer coisa
     types = data["types"]
 
     return {
+        "name": data["name"],
         "id": id,
         "height": height,
         "weight": weight,
