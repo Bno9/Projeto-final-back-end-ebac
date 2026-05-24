@@ -7,18 +7,18 @@ import requests
 app = FastAPI()
 
 @app.get("/pokemons")
-def get_pokemons(limit: int = 10, offset: int = 0) -> dict:
+def get_pokemons(limit: int = 10, offset: int = 10) -> dict:
     response = requests.get(f"https://pokeapi.co/api/v2/pokemon?limit={limit}&offset={offset}")
     data = response.json()
     
     return {
         "data": data,
         "pagination": {
-            "total": 0,
-            "limit": "",
-            "offset": "",
-            "next": "",
-            "previous": None
+            "total": len(data["results"]),
+            "limit": limit,
+            "offset": offset,
+            "next": f"https://pokeapi.co/api/v2/pokemon?limit={limit}&offset={offset+limit}",
+            "previous": f"https://pokeapi.co/api/v2/pokemon?limit={limit}&offset={max(0, offset-limit)}" if offset > 0 else None,
         }
     }
 

@@ -31,7 +31,7 @@ def test_endpoint_all_pokemons():
     assert response.json() == {
         "data": response.json()["data"],
         "pagination": {
-            "total": 1000,
+            "total": 10,
             "limit": 10,
             "offset": 10,
             "next": "https://pokeapi.co/api/v2/pokemon?limit=10&offset=20",
