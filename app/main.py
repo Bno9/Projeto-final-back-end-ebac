@@ -1,10 +1,43 @@
 from fastapi import FastAPI
 from sqlalchemy import create_engine
+from sqlalchemy import Integer, JSON, String
 from sqlalchemy.orm import sessionmaker
-import pydantic
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import DeclarativeBase
+from pydantic import BaseModel
+from typing import Optional
 import requests
 
 app = FastAPI()
+
+engine = create_engine("sqlite://", echo=True)
+Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+class Base(DeclarativeBase):
+    pass
+
+Base.metadata.create_all(bind=engine)
+
+class Pokemon:
+    name: str
+    id: int
+    height: int
+    weight: int
+    types: list[str]
+    level: int
+    sprites: dict[str, str]
+
+class PokemonDB(Base):
+    __tablename__ = "pokemons"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(30))
+    height: Mapped[int] = mapped_column(Integer)
+    weight: Mapped[int] = mapped_column(Integer)
+    types: Mapped[list[str]] = mapped_column(JSON)
+    level: Mapped[int] = mapped_column(Integer)
+    sprites: Mapped[dict[str, str]] = mapped_column(JSON)
+
 
 @app.get("/pokemons")
 def get_pokemons(limit: int = 10, offset: int = 10) -> dict:
