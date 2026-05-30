@@ -12,7 +12,7 @@ import requests
 app = FastAPI()
 
 engine = create_engine("sqlite://", echo=True)
-SessionLocal = sessionmaker(autocommit=True, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(autoflush=False, bind=engine)
 Db = SessionLocal()
 
 class Base(DeclarativeBase):
