@@ -11,14 +11,12 @@ import requests
 
 app = FastAPI()
 
-engine = create_engine("sqlite://", echo=True)
+engine = create_engine("sqlite:///pokemon.db", echo=True)
 SessionLocal = sessionmaker(autoflush=False, bind=engine)
 Db = SessionLocal()
 
 class Base(DeclarativeBase):
     pass
-
-Base.metadata.create_all(bind=engine)
 
 class Pokemon:
     name: str
@@ -38,6 +36,9 @@ class PokemonDB(Base):
     types: Mapped[list[str]] = mapped_column(JSON)
     level: Mapped[int] = mapped_column(Integer)
     sprites: Mapped[dict[str, str]] = mapped_column(JSON)
+
+
+Base.metadata.create_all(bind=engine)
 
 
 @app.get("/pokemons")
@@ -97,6 +98,7 @@ def get_pokemon_by_id(id: int) -> dict:
         }
     ))
 
+    Db.commit()
 
     return {
         "name": data["name"],
