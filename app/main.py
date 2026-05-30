@@ -70,7 +70,10 @@ def get_pokemon_by_id(id: int) -> dict:
             "weight": pokemon.weight,
             "types": pokemon.types,
             "level": pokemon.level,
-            "sprites": pokemon.sprites
+            "sprites": pokemon.sprites,
+
+            
+            "message": "Pokemon encontrado no banco de dados"
         }
 
     response = requests.get(f"https://pokeapi.co/api/v2/pokemon/{id}")
@@ -110,5 +113,7 @@ def get_pokemon_by_id(id: int) -> dict:
         "sprites": {
             "front_default": front_default,
             "back_default": back_default,
-        }
+        },
+        
+        "messaege": "Pokemon encontrado na API e adicionado ao banco de dados"
     }
