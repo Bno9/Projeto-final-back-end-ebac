@@ -12,7 +12,8 @@ import requests
 app = FastAPI()
 
 engine = create_engine("sqlite://", echo=True)
-Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(autocommit=True, autoflush=False, bind=engine)
+Db = SessionLocal()
 
 class Base(DeclarativeBase):
     pass
@@ -57,6 +58,20 @@ def get_pokemons(limit: int = 10, offset: int = 10) -> dict:
 
 @app.get("/pokemons/{id}")
 def get_pokemon_by_id(id: int) -> dict:
+
+    pokemon = Db.query(PokemonDB).filter_by(id=id).first()
+
+    if pokemon:
+        return {
+            "name": pokemon.name,
+            "id": pokemon.id,
+            "height": pokemon.height,
+            "weight": pokemon.weight,
+            "types": pokemon.types,
+            "level": pokemon.level,
+            "sprites": pokemon.sprites
+        }
+
     response = requests.get(f"https://pokeapi.co/api/v2/pokemon/{id}")
     data = response.json()
 
@@ -68,6 +83,20 @@ def get_pokemon_by_id(id: int) -> dict:
 
     level = data["base_experience"] // 20 #fiz um sistema default que o pokemon upa 1 nivel a cada 20 de base_experience, mas isso é só um exemplo, pode ser qualquer coisa
     types = data["types"]
+
+    Db.add(PokemonDB(
+        id=id,
+        name=data["name"],
+        height=height,
+        weight=weight,
+        types=[t["type"]["name"] for t in types],
+        level=level,
+        sprites={
+            "front_default": front_default,
+            "back_default": back_default,
+        }
+    ))
+
 
     return {
         "name": data["name"],
