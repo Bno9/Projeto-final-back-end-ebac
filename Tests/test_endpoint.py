@@ -1,6 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
-from app.main import app
+from app.main import app, PokemonDB
+from pytest_mock import mocker
 
 client = TestClient(app)
 
@@ -41,12 +42,17 @@ def test_endpoint_all_pokemons():
 
     assert response.status_code == 200
 
-def test_endpoint_pokemon_por_id(charmander):
+def test_endpoint_pokemon_por_id(charmander, mocker):
     """
     endpoint /pokemons/{id} deve retornar um json de pokemons da pokeapi.co
     """
 
+    mock_db = mocker.patch("app.main.Db")
+    mock_db.query.return_value.filter_by().first.return_value = None
+
     response = client.get(f"/pokemons/{charmander['id']}")
+
+
 
     assert response.json() == {
         "name": charmander["name"],
@@ -55,7 +61,36 @@ def test_endpoint_pokemon_por_id(charmander):
         "weight": charmander["weight"],
         "types": charmander["types"],
         "level": charmander["level"],
-        "sprites": charmander["sprites"]
+        "sprites": charmander["sprites"],
+
+        "message": "Pokemon encontrado na API e adicionado ao banco de dados"
         }
 
     assert response.status_code == 200
+
+def test_banco_de_dados(charmander, mocker):
+    """
+    endpoint /pokemons/{id} deve utilizar o banco de dados para verificar se o pokemon já existe antes de fazer a requisição para a pokeapi.co
+    """
+
+    mock_db = mocker.patch("app.main.Db")
+
+    response = client.get(f"/pokemons/{charmander['id']}")
+
+    mock_db.query.assert_called_with(PokemonDB)
+
+    mock_db.query().filter_by.assert_called_with(id=charmander["id"])
+
+    existe = mock_db.query(PokemonDB).filter_by(id=charmander["id"]).first()
+
+    if not existe:
+        mock_db.add.assert_called_once_with(PokemonDB(
+            id=charmander["id"],
+            name=charmander["name"],
+            height=charmander["height"],
+            weight=charmander["weight"],
+            types=charmander["types"],
+            level=charmander["level"],
+            sprites=charmander["sprites"],
+         ))
+        mock_db.commit.assert_called_once()
