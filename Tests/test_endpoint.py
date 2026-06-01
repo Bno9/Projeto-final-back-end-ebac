@@ -1,6 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
+from pytest_mock import mocker
 
 client = TestClient(app)
 
@@ -41,12 +42,17 @@ def test_endpoint_all_pokemons():
 
     assert response.status_code == 200
 
-def test_endpoint_pokemon_por_id(charmander):
+def test_endpoint_pokemon_por_id(charmander, mocker):
     """
     endpoint /pokemons/{id} deve retornar um json de pokemons da pokeapi.co
     """
 
+    mock_db = mocker.patch("app.main.Db")
+    mock_db.query.return_value.filter_by().first.return_value = None
+
     response = client.get(f"/pokemons/{charmander['id']}")
+
+
 
     assert response.json() == {
         "name": charmander["name"],
@@ -55,7 +61,9 @@ def test_endpoint_pokemon_por_id(charmander):
         "weight": charmander["weight"],
         "types": charmander["types"],
         "level": charmander["level"],
-        "sprites": charmander["sprites"]
+        "sprites": charmander["sprites"],
+
+        "message": "Pokemon encontrado na API e adicionado ao banco de dados"
         }
 
     assert response.status_code == 200

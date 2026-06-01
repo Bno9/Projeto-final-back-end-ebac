@@ -115,5 +115,5 @@ def get_pokemon_by_id(id: int) -> dict:
             "back_default": back_default,
         },
         
-        "messaege": "Pokemon encontrado na API e adicionado ao banco de dados"
+        "message": "Pokemon encontrado na API e adicionado ao banco de dados"
     }
