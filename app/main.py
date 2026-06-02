@@ -18,14 +18,12 @@ Db = SessionLocal()
 class Base(DeclarativeBase):
     pass
 
-class Pokemon:
+class Pokemon(BaseModel):
     name: str
-    id: int
     height: int
     weight: int
     types: list[str]
     level: int
-    sprites: dict[str, str]
 
 class PokemonDB(Base):
     __tablename__ = "pokemons"
@@ -116,4 +114,28 @@ def get_pokemon_by_id(id: int) -> dict:
         },
         
         "message": "Pokemon encontrado na API e adicionado ao banco de dados"
+    }
+
+@app.post("/criar-pokemon")
+def create_pokemon(pokemon: Pokemon) -> dict:
+
+    pokemondb = Db.query(PokemonDB).filter_by(id=pokemon.name).first()
+
+    if pokemondb:
+        return {
+            "message": f"Pokemon {pokemon.name} já existe no banco de dados",
+        }
+
+    Db.add(PokemonDB(
+        name=pokemon.name,
+        height=pokemon.height,
+        weight=pokemon.weight,
+        types=pokemon.types,
+        level=pokemon.level
+    ))
+
+    Db.commit()
+
+    return {
+        "message": f"Pokemon {pokemon.name} adicionado ao banco de dados",
     }
