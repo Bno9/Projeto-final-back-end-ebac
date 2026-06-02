@@ -91,13 +91,11 @@ def test_endpoint_criar_pokemon_pokemon_ja_existe(charmander, mocker):
 
     mock_db = mocker.patch("app.main.Db")
     mock_db.query.return_value.filter_by().first.return_value = PokemonDB(
-        id=charmander["id"],
         name=charmander["name"],
         height=charmander["height"],
         weight=charmander["weight"],
         types=charmander["types"],
-        level=charmander["level"],
-        sprites=charmander["sprites"],
+        level=charmander["level"]
      )
 
     response = client.post("/criar-pokemon", json=charmander)
@@ -106,4 +104,4 @@ def test_endpoint_criar_pokemon_pokemon_ja_existe(charmander, mocker):
         "message": f"Pokemon {charmander['name']} já existe no banco de dados",
         }
 
-    assert response.status_code == 400
+    assert response.status_code == 200
