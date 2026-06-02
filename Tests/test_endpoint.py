@@ -23,6 +23,22 @@ def charmander():
         }
     }
 
+@pytest.fixture()
+def squirtle():
+    return {
+        "name": "squirtle",
+        "id": None,
+        "height": 5,
+        "weight": 90,
+        "types": ["water"],
+        "level": 3,
+        "sprites": {
+            "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png",
+            "back_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/7.png",
+        }
+    }
+
+
 def test_endpoint_all_pokemons():
     """
     endpoint /pokemons deve retornar um json de pokemons da pokeapi.co
@@ -84,7 +100,7 @@ def test_endpoint_criar_pokemon(charmander, mocker):
 
     assert response.status_code == 200
 
-def test_endpoint_criar_pokemon_pokemon_ja_existe(charmander, mocker):
+def test_endpoint_criar_pokemon_ja_existente(charmander, mocker):
     """
     endpoint /criar_pokemon/{id} deve criar um pokemons novo no banco de dados, usando os dados passados pelo usuario, e retornar um json de confirmação
     """
@@ -105,3 +121,35 @@ def test_endpoint_criar_pokemon_pokemon_ja_existe(charmander, mocker):
         }
 
     assert response.status_code == 200
+
+def test_endpoint_atualizar_pokemon(charmander, squirtle, mocker):
+    
+    mock_db = mocker.patch("app.main.Db")
+    mock_db.query.return_value.filter_by().first.return_value = PokemonDB(
+        name=charmander["name"],
+        height=charmander["height"],
+        weight=charmander["weight"],
+        types=charmander["types"],
+        level=charmander["level"]
+     )
+
+    response = client.put("/atualizar-pokemon", json=squirtle)
+
+    assert response.json() == {
+        "message": f"Informações do pokemon {charmander['name']} atualizadas com sucesso",
+        }
+
+    assert response.status_code == 200
+
+def test_endpoint_atualizar_pokemon_nao_existente(charmander, mocker):
+    
+    mock_db = mocker.patch("app.main.Db")
+    mock_db.query.return_value.filter_by().first.return_value = None
+
+    response = client.put("/atualizar-pokemon", json=charmander)
+
+    assert response.json() == {
+        "message": f"O pokemon {charmander['name']} não foi encontrado no banco de dados",
+        }
+
+    assert response.status_code == 404
