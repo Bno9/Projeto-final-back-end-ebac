@@ -68,29 +68,42 @@ def test_endpoint_pokemon_por_id(charmander, mocker):
 
     assert response.status_code == 200
 
-def test_banco_de_dados(charmander, mocker):
+def test_endpoint_criar_pokemon(charmander, mocker):
     """
-    endpoint /pokemons/{id} deve utilizar o banco de dados para verificar se o pokemon já existe antes de fazer a requisição para a pokeapi.co
+    endpoint /criar_pokemon/{id} deve criar um pokemons novo no banco de dados, usando os dados passados pelo usuario, e retornar um json de confirmação
     """
 
     mock_db = mocker.patch("app.main.Db")
+    mock_db.query.return_value.filter_by().first.return_value = None
 
-    response = client.get(f"/pokemons/{charmander['id']}")
+    response = client.get(f"/criar_pokemon/{charmander['name']}/{charmander['height']}/{charmander['weight']}/{charmander['types']}/{charmander['level']}")
 
-    mock_db.query.assert_called_with(PokemonDB)
+    assert response.json() == {
+        "message": f"Pokemon {charmander['name']} adicionado ao banco de dados",
+        }
 
-    mock_db.query().filter_by.assert_called_with(id=charmander["id"])
+    assert response.status_code == 200
 
-    existe = mock_db.query(PokemonDB).filter_by(id=charmander["id"]).first()
+def test_endpoint_criar_pokemon_pokemon_ja_existe(charmander, mocker):
+    """
+    endpoint /criar_pokemon/{id} deve criar um pokemons novo no banco de dados, usando os dados passados pelo usuario, e retornar um json de confirmação
+    """
 
-    if not existe:
-        mock_db.add.assert_called_once_with(PokemonDB(
-            id=charmander["id"],
-            name=charmander["name"],
-            height=charmander["height"],
-            weight=charmander["weight"],
-            types=charmander["types"],
-            level=charmander["level"],
-            sprites=charmander["sprites"],
-         ))
-        mock_db.commit.assert_called_once()
+    mock_db = mocker.patch("app.main.Db")
+    mock_db.query.return_value.filter_by().first.return_value = PokemonDB(
+        id=charmander["id"],
+        name=charmander["name"],
+        height=charmander["height"],
+        weight=charmander["weight"],
+        types=charmander["types"],
+        level=charmander["level"],
+        sprites=charmander["sprites"],
+     )
+
+    response = client.get(f"/criar_pokemon/{charmander['name']}/{charmander['height']}/{charmander['weight']}/{charmander['types']}/{charmander['level']}")
+
+    assert response.json() == {
+        "message": f"Pokemon {charmander['name']} já existe no banco de dados",
+        }
+
+    assert response.status_code == 400
