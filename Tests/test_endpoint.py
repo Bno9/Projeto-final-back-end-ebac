@@ -70,13 +70,13 @@ def test_endpoint_pokemon_por_id(charmander, mocker):
 
 def test_endpoint_criar_pokemon(charmander, mocker):
     """
-    endpoint /criar_pokemon/{id} deve criar um pokemons novo no banco de dados, usando os dados passados pelo usuario, e retornar um json de confirmação
+    endpoint /criar-pokemon/{id} deve criar um pokemons novo no banco de dados, usando os dados passados pelo usuario, e retornar um json de confirmação
     """
 
     mock_db = mocker.patch("app.main.Db")
     mock_db.query.return_value.filter_by().first.return_value = None
 
-    response = client.get(f"/criar_pokemon/{charmander['name']}/{charmander['height']}/{charmander['weight']}/{charmander['types']}/{charmander['level']}")
+    response = client.post("/criar-pokemon", json=charmander)
 
     assert response.json() == {
         "message": f"Pokemon {charmander['name']} adicionado ao banco de dados",
@@ -100,7 +100,7 @@ def test_endpoint_criar_pokemon_pokemon_ja_existe(charmander, mocker):
         sprites=charmander["sprites"],
      )
 
-    response = client.get(f"/criar_pokemon/{charmander['name']}/{charmander['height']}/{charmander['weight']}/{charmander['types']}/{charmander['level']}")
+    response = client.post("/criar-pokemon", json=charmander)
 
     assert response.json() == {
         "message": f"Pokemon {charmander['name']} já existe no banco de dados",
