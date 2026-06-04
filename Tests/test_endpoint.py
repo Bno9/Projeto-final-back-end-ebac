@@ -191,7 +191,7 @@ def test_endpoint_get_pokemon_nao_existente(charmander, mocker):
     mock_db = mocker.patch("app.main.Db")
     mock_db.query.return_value.filter_by().first.return_value = None
 
-    response = client.get(f"/pokemons/{charmander['name']}")
+    response = client.get(f"/pokemons-criados/{charmander['name']}")
 
     assert response.json() == {
         "detail": f"O pokemon {charmander['name']} não foi encontrado no banco de dados",
@@ -199,21 +199,40 @@ def test_endpoint_get_pokemon_nao_existente(charmander, mocker):
 
     assert response.status_code == 404
 
-def test_endpoint_get_pokemon(charmander, mocker):
+def test_endpoint_get_pokemon_por_nome(charmander, squirtle, mocker):
     
     mock_db = mocker.patch("app.main.Db")
-    mock_db.query.return_value.filter_by().first.return_value = PokemonDB(
+    pokemons = mock_db.query.return_value.all.return_value = [
+        PokemonDB(
         name=charmander["name"],
         height=charmander["height"],
         weight=charmander["weight"],
         types=charmander["types"],
-        level=charmander["level"]
-    )
+        level=charmander["level"]),
 
-    response = client.get(f"/pokemons/{charmander['name']}")
+        PokemonDB(
+        name=squirtle["name"],
+        height=squirtle["height"],
+        weight=squirtle["weight"],
+        types=squirtle["types"],
+        level=squirtle["level"])
+    ]
+
+    response = client.get(f"/pokemons-criados")
 
     assert response.json() == {
-        "detail": f"O pokemon {charmander['name']} não foi encontrado no banco de dados",
-        }
+        "data": [
+            {
+                "name": pokemon.name,
+                "height": pokemon.height,
+                "weight": pokemon.weight,
+                "types": pokemon.types,
+                "level": pokemon.level,
+                "sprites": pokemon.sprites,
+            }
+            for pokemon in pokemons
+        ],
+        "message": f"{len(pokemons)} pokemons no banco de dados"
+    }
 
-    assert response.status_code == 404
+    assert response.status_code == 200

@@ -178,7 +178,7 @@ def delete_pokmeon(name: str) -> dict:
         "message": f"Pokemon {name} removido do banco de dados"
     }
 
-@app.get("/pokemons/{name}")
+@app.get("/pokemons-criados/{name}")
 def get_pokemon_by_name(name: str) -> dict:
     
     pokemon = Db.query(PokemonDB).filter_by(id=name).first()
@@ -199,7 +199,7 @@ def get_pokemon_by_name(name: str) -> dict:
 
     raise HTTPException(
         status_code=404,
-        detail=f"O pokemon {name} não  encontrado no banco de dados")
+        detail=f"O pokemon {name} não foi encontrado no banco de dados")
 
 @app.get("/pokemons-criados")
 def get_created_pokemons() -> dict:
@@ -209,7 +209,6 @@ def get_created_pokemons() -> dict:
         "data": [
             {
                 "name": pokemon.name,
-                "id": pokemon.id,
                 "height": pokemon.height,
                 "weight": pokemon.weight,
                 "types": pokemon.types,
@@ -218,5 +217,5 @@ def get_created_pokemons() -> dict:
             }
             for pokemon in pokemons
         ],
-        "message": f"{len(pokemons)} pokemons criados no banco de dados"
+        "message": f"{len(pokemons)} pokemons no banco de dados"
     }
