@@ -122,9 +122,9 @@ def create_pokemon(pokemon: Pokemon) -> dict:
     pokemondb = Db.query(PokemonDB).filter_by(id=pokemon.name).first()
 
     if pokemondb:
-        return {
-            "message": f"Pokemon {pokemon.name} já existe no banco de dados",
-        }
+        raise HTTPException(
+        status_code=409, 
+        detail=f"Pokemon {pokemon.name} já existe no banco de dados")
 
     Db.add(PokemonDB(
         name=pokemon.name,
@@ -146,7 +146,9 @@ def update_pokemon(name: str, pokemon: Pokemon) -> dict:
     pokemondb = Db.query(PokemonDB).filter_by(id=pokemon.name).first()
 
     if not pokemondb:
-        raise HTTPException(status_code=404, detail=f"O pokemon {name} não foi encontrado no banco de dados")
+        raise HTTPException(
+            status_code=404,
+            detail=f"O pokemon {name} não foi encontrado no banco de dados")
     
     pokemondb.height = pokemon.height
     pokemondb.weight = pokemon.weight

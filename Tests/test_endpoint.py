@@ -117,10 +117,10 @@ def test_endpoint_criar_pokemon_ja_existente(charmander, mocker):
     response = client.post("/criar-pokemon", json=charmander)
 
     assert response.json() == {
-        "message": f"Pokemon {charmander['name']} já existe no banco de dados",
+        "detail": f"Pokemon {charmander['name']} já existe no banco de dados",
         }
 
-    assert response.status_code == 200
+    assert response.status_code == 409
 
 def test_endpoint_atualizar_pokemon(charmander, squirtle, mocker):
     
