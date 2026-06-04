@@ -160,3 +160,63 @@ def update_pokemon(name: str, pokemon: Pokemon) -> dict:
     return {
         "message": f"Informações do pokemon {name} atualizadas com sucesso"
     }
+
+@app.delete("/deletar-pokemon/{name}")
+def delete_pokmeon(name: str) -> dict:
+
+    pokemondb = Db.query(PokemonDB).filter_by(id=name).first()
+
+    if not pokemondb:
+        raise HTTPException(
+            status_code=404,
+            detail=f"O pokemon {name} não foi encontrado no banco de dados")
+    
+    Db.delete(pokemondb)
+    Db.commit()
+
+    return {
+        "message": f"Pokemon {name} removido do banco de dados"
+    }
+
+@app.get("/pokemons/{name}")
+def get_pokemon_by_name(name: str) -> dict:
+    
+    pokemon = Db.query(PokemonDB).filter_by(id=name).first()
+
+    if pokemon:
+        return {
+            "name": pokemon.name,
+            "id": pokemon.id,
+            "height": pokemon.height,
+            "weight": pokemon.weight,
+            "types": pokemon.types,
+            "level": pokemon.level,
+            "sprites": pokemon.sprites,
+
+            
+            "message": "Pokemon encontrado no banco de dados"
+        }
+
+    raise HTTPException(
+        status_code=404,
+        detail=f"O pokemon {name} não  encontrado no banco de dados")
+
+@app.get("/pokemons-criados")
+def get_created_pokemons() -> dict:
+    pokemons = Db.query(PokemonDB).all()
+
+    return {
+        "data": [
+            {
+                "name": pokemon.name,
+                "id": pokemon.id,
+                "height": pokemon.height,
+                "weight": pokemon.weight,
+                "types": pokemon.types,
+                "level": pokemon.level,
+                "sprites": pokemon.sprites,
+            }
+            for pokemon in pokemons
+        ],
+        "message": f"{len(pokemons)} pokemons criados no banco de dados"
+    }
