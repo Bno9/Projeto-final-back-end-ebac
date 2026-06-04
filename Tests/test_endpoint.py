@@ -133,7 +133,7 @@ def test_endpoint_atualizar_pokemon(charmander, squirtle, mocker):
         level=charmander["level"]
      )
 
-    response = client.put("/atualizar-pokemon", json=squirtle)
+    response = client.put(f"/atualizar-pokemon/{charmander['name']}", json=squirtle)
 
     assert response.json() == {
         "message": f"Informações do pokemon {charmander['name']} atualizadas com sucesso",
@@ -146,10 +146,10 @@ def test_endpoint_atualizar_pokemon_nao_existente(charmander, mocker):
     mock_db = mocker.patch("app.main.Db")
     mock_db.query.return_value.filter_by().first.return_value = None
 
-    response = client.put("/atualizar-pokemon", json=charmander)
+    response = client.put(f"/atualizar-pokemon/{charmander['name']}", json=charmander)
 
     assert response.json() == {
-        "message": f"O pokemon {charmander['name']} não foi encontrado no banco de dados",
+        "detail": f"O pokemon {charmander['name']} não foi encontrado no banco de dados",
         }
 
     assert response.status_code == 404
