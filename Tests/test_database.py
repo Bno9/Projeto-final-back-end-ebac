@@ -2,6 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 from app.main import app, PokemonDB
 from pytest_mock import mocker
+from Tests.test_endpoint import charmander
 
 client = TestClient(app)
 
