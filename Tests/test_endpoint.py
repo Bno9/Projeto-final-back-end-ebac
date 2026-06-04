@@ -10,6 +10,7 @@ def charmander():
     """
     Fixture para criar um pokemon charmander (id 4) para ser usado nos testes, usando os dados da pokeapi.co
     """
+
     return {
         "name": "charmander",
         "id": 4,
@@ -25,9 +26,13 @@ def charmander():
 
 @pytest.fixture()
 def squirtle():
+    """
+    Fixture para criar um pokemon squirtle (id 7) para ser usado nos testes, usando os dados da pokeapi.co
+    """
+
     return {
         "name": "squirtle",
-        "id": None,
+        "id": 7,
         "height": 5,
         "weight": 90,
         "types": ["water"],
@@ -40,9 +45,6 @@ def squirtle():
 
 
 def test_endpoint_all_pokemons():
-    """
-    endpoint /pokemons deve retornar um json de pokemons da pokeapi.co
-    """
     response = client.get("/pokemons")
 
     assert response.json() == {
@@ -59,16 +61,10 @@ def test_endpoint_all_pokemons():
     assert response.status_code == 200
 
 def test_endpoint_pokemon_por_id(charmander, mocker):
-    """
-    endpoint /pokemons/{id} deve retornar um json de pokemons da pokeapi.co
-    """
-
     mock_db = mocker.patch("app.main.Db")
     mock_db.query.return_value.filter_by().first.return_value = None
 
     response = client.get(f"/pokemons/{charmander['id']}")
-
-
 
     assert response.json() == {
         "name": charmander["name"],
@@ -85,10 +81,6 @@ def test_endpoint_pokemon_por_id(charmander, mocker):
     assert response.status_code == 200
 
 def test_endpoint_criar_pokemon(charmander, mocker):
-    """
-    endpoint /criar-pokemon/{id} deve criar um pokemons novo no banco de dados, usando os dados passados pelo usuario, e retornar um json de confirmação
-    """
-
     mock_db = mocker.patch("app.main.Db")
     mock_db.query.return_value.filter_by().first.return_value = None
 
@@ -101,10 +93,6 @@ def test_endpoint_criar_pokemon(charmander, mocker):
     assert response.status_code == 200
 
 def test_endpoint_criar_pokemon_ja_existente(charmander, mocker):
-    """
-    endpoint /criar_pokemon/{id} deve criar um pokemons novo no banco de dados, usando os dados passados pelo usuario, e retornar um json de confirmação
-    """
-
     mock_db = mocker.patch("app.main.Db")
     mock_db.query.return_value.filter_by().first.return_value = PokemonDB(
         name=charmander["name"],
