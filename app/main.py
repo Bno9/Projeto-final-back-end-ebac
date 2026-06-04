@@ -6,7 +6,6 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import DeclarativeBase
 from pydantic import BaseModel
-from typing import Optional
 import requests
 
 app = FastAPI()
@@ -18,6 +17,7 @@ Db = SessionLocal()
 class Base(DeclarativeBase):
     pass
 
+#Classe do tipo Pydantic, usada para validar os dados de entrada do usuario na criação e atualização de pokemons criados pelo usuario
 class Pokemon(BaseModel):
     name: str
     height: int
@@ -25,6 +25,7 @@ class Pokemon(BaseModel):
     types: list[str]
     level: int
 
+#Classe do tipo SQLAlchemy, usada para mapear a tabela de pokemons no banco de dados, e armazenar os pokemons criados pelo usuario
 class PokemonDB(Base):
     __tablename__ = "pokemons"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -35,12 +36,23 @@ class PokemonDB(Base):
     level: Mapped[int] = mapped_column(Integer)
     sprites: Mapped[dict[str, str]] = mapped_column(JSON)
 
-
+#Criando as tabelas no banco de dados, caso elas ainda não existam
 Base.metadata.create_all(bind=engine)
-
 
 @app.get("/pokemons")
 def get_pokemons(limit: int = 10, offset: int = 10) -> dict:
+    """
+    Endpoint /pokemons deve retornar um json de pokemons da pokeapi.co, com paginação usando os query params limit e offset
+    
+    Parâmetros:
+    - limit: número de pokemons a serem retornados (padrão: 10)
+    - offset: número de pokemons a serem pulados antes de começar a retornar os resultados (padrão: 10)
+    
+    Retorna:
+    - data: lista de pokemons retornados pela pokeapi.co
+    - pagination: informações sobre a paginação, incluindo total de pokemons, limite, offset, e links para a próxima e anterior página
+    """
+
     response = requests.get(f"https://pokeapi.co/api/v2/pokemon?limit={limit}&offset={offset}")
     data = response.json()
     
@@ -57,6 +69,17 @@ def get_pokemons(limit: int = 10, offset: int = 10) -> dict:
 
 @app.get("/pokemons/{id}")
 def get_pokemon_by_id(id: int) -> dict:
+    """
+    Endpoint /pokemons/{id} deve retornar um json de um pokemon especifico da pokeapi.co, usando o id do pokemon como parametro de rota.
+    Se o pokemon já existir no banco de dados, deve retornar os dados do pokemon do banco de dados, caso contrário, deve buscar os dados na pokeapi.co, 
+    adicionar ao banco de dados e retornar os dados do pokemon
+      
+    Parametros:
+    - id: id do pokemon a ser buscado
+      
+    Retorno: 
+    - dicionario com os dados do pokemon, incluindo nome, id, altura, peso, tipos, level e sprites, e uma mensagem indicando se o pokemon foi encontrado no banco de dados ou na API
+    """
 
     pokemon = Db.query(PokemonDB).filter_by(id=id).first()
 
@@ -116,8 +139,20 @@ def get_pokemon_by_id(id: int) -> dict:
         "message": "Pokemon encontrado na API e adicionado ao banco de dados"
     }
 
+
+#Como foram feitas duas propostas diferente de projeto e não ficou definido qual deveria ser feita, resolvi fazer as duas. Acima são os endpoints para buscar pokemons na pokeapi, e abaixo estão os endpoints para criar, atualizar, deletar e buscar pokemons criados pelo usuario.
+
 @app.post("/criar-pokemon")
 def create_pokemon(pokemon: Pokemon) -> dict:
+    """
+    Endpoint /criar-pokemon deve criar um pokemon novo no banco de dados usando os dados passados pelo usuario
+    
+    Parametros:
+    - pokemon: objeto do tipo Pokemon, contendo os dados do pokemon a ser criado, incluindo nome, altura, peso, tipos e level
+    
+    Retorno:
+    - dicionario com uma mensagem de confirmação indicando que o pokemon foi adicionado ao banco de dados, ou um erro caso o pokemon já exista no banco de dados
+    """
 
     pokemondb = Db.query(PokemonDB).filter_by(id=pokemon.name).first()
 
@@ -142,6 +177,17 @@ def create_pokemon(pokemon: Pokemon) -> dict:
 
 @app.put("/atualizar-pokemon/{name}")
 def update_pokemon(name: str, pokemon: Pokemon) -> dict:
+    """
+    Endpoint /atualizar-pokemon/{name} deve atualiar as informações de um pokemon já existente no banco de dados, 
+    usando o nnome do pokemon como parametro de rota e os dados atualizados passados pelo usuario no corpo da requisição
+    
+    Parametros: 
+    - name: nome do pokemon a ser atualizado
+    - pokemon: objeto do tipo Pokemon, contendo os dados atualizados do pokemon, incluindo nome, altura, peso, tipos e level
+        
+    Retorno:
+    - dicionario com uma mensagem de confirmação indicando que as informações do pokemon foram atualizadas com sucesso, ou um erro caso o pokemon não exista no banco de dados
+    """
     
     pokemondb = Db.query(PokemonDB).filter_by(id=pokemon.name).first()
 
@@ -163,6 +209,15 @@ def update_pokemon(name: str, pokemon: Pokemon) -> dict:
 
 @app.delete("/deletar-pokemon/{name}")
 def delete_pokmeon(name: str) -> dict:
+    """
+    Endpoint /deletar-pokemon/{name} deve deletar um pokemon do banco de dados, usando o nome do pokemon como parametro de rota
+    
+    Parametros:
+    - name: nome do pokemon a ser deletado
+    
+    Retorno:
+    - dicionario com uma mensagem de confirmação indicando que o pokemon foi removido do banco de dados, ou um erro caso o pokemon não exista no banco de dados
+    """
 
     pokemondb = Db.query(PokemonDB).filter_by(id=name).first()
 
@@ -180,6 +235,10 @@ def delete_pokmeon(name: str) -> dict:
 
 @app.get("/pokemons-criados/{name}")
 def get_pokemon_by_name(name: str) -> dict:
+    """
+    Endpoint /pokemons-criados/{name} deve retornar um json de um pokemon criado pelo usuario, usando o nome do pokemon como parametro de rota.
+    Se o pokemon existir no banco de dados, deve retornar os dados do pokemon, caso contrário, deve retornar um erro indicando que o pokemon não foi encontrado no banco de dados
+    """
     
     pokemon = Db.query(PokemonDB).filter_by(id=name).first()
 
@@ -203,6 +262,10 @@ def get_pokemon_by_name(name: str) -> dict:
 
 @app.get("/pokemons-criados")
 def get_created_pokemons() -> dict:
+    """
+    Endpoint /pokemons-criados deve retornar um json de todos os pokemons criados pelo usuario, buscando os dados no banco de dados
+    """
+
     pokemons = Db.query(PokemonDB).all()
 
     return {
