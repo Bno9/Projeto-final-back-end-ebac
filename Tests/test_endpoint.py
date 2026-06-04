@@ -45,6 +45,7 @@ def squirtle():
 
 
 def test_endpoint_all_pokemons():
+    
     response = client.get("/pokemons")
 
     assert response.json() == {
@@ -61,6 +62,7 @@ def test_endpoint_all_pokemons():
     assert response.status_code == 200
 
 def test_endpoint_pokemon_por_id(charmander, mocker):
+
     mock_db = mocker.patch("app.main.Db")
     mock_db.query.return_value.filter_by().first.return_value = None
 
@@ -81,6 +83,7 @@ def test_endpoint_pokemon_por_id(charmander, mocker):
     assert response.status_code == 200
 
 def test_endpoint_criar_pokemon(charmander, mocker):
+
     mock_db = mocker.patch("app.main.Db")
     mock_db.query.return_value.filter_by().first.return_value = None
 
@@ -93,6 +96,7 @@ def test_endpoint_criar_pokemon(charmander, mocker):
     assert response.status_code == 200
 
 def test_endpoint_criar_pokemon_ja_existente(charmander, mocker):
+
     mock_db = mocker.patch("app.main.Db")
     mock_db.query.return_value.filter_by().first.return_value = PokemonDB(
         name=charmander["name"],
