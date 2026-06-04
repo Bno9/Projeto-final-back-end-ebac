@@ -153,3 +153,67 @@ def test_endpoint_atualizar_pokemon_nao_existente(charmander, mocker):
         }
 
     assert response.status_code == 404
+
+def test_endpoint_deletar_pokemon_nao_existente(charmander, mocker):
+    
+    mock_db = mocker.patch("app.main.Db")
+    mock_db.query.return_value.filter_by().first.return_value = None
+
+    response = client.delete(f"/deletar-pokemon/{charmander['name']}")
+
+    assert response.json() == {
+        "detail": f"O pokemon {charmander['name']} não foi encontrado no banco de dados",
+        }
+
+    assert response.status_code == 404
+
+def test_endpoint_deletar_pokemon_existente(charmander, mocker):
+    
+    mock_db = mocker.patch("app.main.Db")
+    mock_db.query.return_value.filter_by().first.return_value = PokemonDB(
+        name=charmander["name"],
+        height=charmander["height"],
+        weight=charmander["weight"],
+        types=charmander["types"],
+        level=charmander["level"]
+     )
+
+    response = client.delete(f"/deletar-pokemon/{charmander['name']}")
+
+    assert response.json() == {
+        "message": f"Pokemon {charmander['name']} removido do banco de dados",
+        }
+
+    assert response.status_code == 200
+
+def test_endpoint_get_pokemon_nao_existente(charmander, mocker):
+    
+    mock_db = mocker.patch("app.main.Db")
+    mock_db.query.return_value.filter_by().first.return_value = None
+
+    response = client.get(f"/pokemons/{charmander['name']}")
+
+    assert response.json() == {
+        "detail": f"O pokemon {charmander['name']} não foi encontrado no banco de dados",
+        }
+
+    assert response.status_code == 404
+
+def test_endpoint_get_pokemon(charmander, mocker):
+    
+    mock_db = mocker.patch("app.main.Db")
+    mock_db.query.return_value.filter_by().first.return_value = PokemonDB(
+        name=charmander["name"],
+        height=charmander["height"],
+        weight=charmander["weight"],
+        types=charmander["types"],
+        level=charmander["level"]
+    )
+
+    response = client.get(f"/pokemons/{charmander['name']}")
+
+    assert response.json() == {
+        "detail": f"O pokemon {charmander['name']} não foi encontrado no banco de dados",
+        }
+
+    assert response.status_code == 404
