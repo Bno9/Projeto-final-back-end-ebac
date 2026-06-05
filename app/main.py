@@ -11,11 +11,12 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///:memory:")
 
 app = FastAPI()
 
 engine = create_engine(
-    DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///:memory:"),
+    DATABASE_URL,
     echo=True
 )
 SessionLocal = sessionmaker(autoflush=False, bind=engine)
