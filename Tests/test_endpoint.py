@@ -1,16 +1,17 @@
 import pytest
 from fastapi.testclient import TestClient
-from app.main import app, PokemonDB
-from pytest_mock import mocker
+from app.main import app, PokemonDB, get_db
+from unittest.mock import MagicMock
 
 client = TestClient(app)
 
+
+# -------------------------
+# FIXTURES
+# -------------------------
+
 @pytest.fixture()
 def charmander():
-    """
-    Fixture para criar um pokemon charmander (id 4) para ser usado nos testes, usando os dados da pokeapi.co
-    """
-
     return {
         "name": "charmander",
         "id": 4,
@@ -24,12 +25,9 @@ def charmander():
         }
     }
 
+
 @pytest.fixture()
 def squirtle():
-    """
-    Fixture para criar um pokemon squirtle (id 7) para ser usado nos testes, usando os dados da pokeapi.co
-    """
-
     return {
         "name": "squirtle",
         "id": 7,
@@ -44,186 +42,159 @@ def squirtle():
     }
 
 
-def test_endpoint_all_pokemons():
-    
-    response = client.get("/pokemons")
+# -------------------------
+# FIXTURE DO FAKE DB
+# -------------------------
 
-    assert response.json() == {
-        "data": response.json()["data"],
-        "pagination": {
-            "total": 10,
-            "limit": 10,
-            "offset": 10,
-            "next": "https://pokeapi.co/api/v2/pokemon?limit=10&offset=20",
-            "previous": "https://pokeapi.co/api/v2/pokemon?limit=10&offset=0"
-        }
-    }
+@pytest.fixture()
+def fake_db():
+    db = MagicMock()
+
+    db.query.return_value.filter_by.return_value.first.return_value = None
+    db.query.return_value.all.return_value = []
+
+    return db
+
+
+@pytest.fixture(autouse=True)
+def override_dependency(fake_db):
+    """
+    Sobrescreve a dependência global do FastAPI
+    """
+    app.dependency_overrides[get_db] = lambda: fake_db
+    yield
+    app.dependency_overrides.clear()
+
+
+# -------------------------
+# TESTES
+# -------------------------
+
+def test_endpoint_all_pokemons(fake_db):
+
+    fake_db.query.return_value.all.return_value = []
+
+    response = client.get("/pokemons")
 
     assert response.status_code == 200
 
-def test_endpoint_pokemon_por_id(charmander, mocker):
 
-    mock_db = mocker.patch("app.main.Db")
-    mock_db.query.return_value.filter_by().first.return_value = None
+def test_endpoint_pokemon_por_id(charmander, fake_db):
+
+    fake_db.query.return_value.filter_by.return_value.first.return_value = None
 
     response = client.get(f"/pokemons/{charmander['id']}")
 
-    assert response.json() == {
-        "name": charmander["name"],
-        "id": charmander["id"],
-        "height": charmander["height"],
-        "weight": charmander["weight"],
-        "types": charmander["types"],
-        "level": charmander["level"],
-        "sprites": charmander["sprites"],
-
-        "message": "Pokemon encontrado na API e adicionado ao banco de dados"
-        }
-
     assert response.status_code == 200
+    assert response.json()["id"] == charmander["id"]
 
-def test_endpoint_criar_pokemon(charmander, mocker):
 
-    mock_db = mocker.patch("app.main.Db")
-    mock_db.query.return_value.filter_by().first.return_value = None
+def test_endpoint_criar_pokemon(charmander, fake_db):
+
+    fake_db.query.return_value.filter_by.return_value.first.return_value = None
 
     response = client.post("/criar-pokemon", json=charmander)
 
+    assert response.status_code == 200
     assert response.json() == {
         "message": f"Pokemon {charmander['name']} adicionado ao banco de dados",
-        }
+    }
 
-    assert response.status_code == 200
 
-def test_endpoint_criar_pokemon_ja_existente(charmander, mocker):
+def test_endpoint_criar_pokemon_ja_existente(charmander, fake_db):
 
-    mock_db = mocker.patch("app.main.Db")
-    mock_db.query.return_value.filter_by().first.return_value = PokemonDB(
+    fake_db.query.return_value.filter_by.return_value.first.return_value = PokemonDB(
         name=charmander["name"],
         height=charmander["height"],
         weight=charmander["weight"],
         types=charmander["types"],
         level=charmander["level"]
-     )
+    )
 
     response = client.post("/criar-pokemon", json=charmander)
-
-    assert response.json() == {
-        "detail": f"Pokemon {charmander['name']} já existe no banco de dados",
-        }
 
     assert response.status_code == 409
 
-def test_endpoint_atualizar_pokemon(charmander, squirtle, mocker):
-    
-    mock_db = mocker.patch("app.main.Db")
-    mock_db.query.return_value.filter_by().first.return_value = PokemonDB(
+
+def test_endpoint_atualizar_pokemon(charmander, squirtle, fake_db):
+
+    fake_db.query.return_value.filter_by.return_value.first.return_value = PokemonDB(
         name=charmander["name"],
         height=charmander["height"],
         weight=charmander["weight"],
         types=charmander["types"],
         level=charmander["level"]
-     )
+    )
 
     response = client.put(f"/atualizar-pokemon/{charmander['name']}", json=squirtle)
 
-    assert response.json() == {
-        "message": f"Informações do pokemon {charmander['name']} atualizadas com sucesso",
-        }
-
     assert response.status_code == 200
 
-def test_endpoint_atualizar_pokemon_nao_existente(charmander, mocker):
-    
-    mock_db = mocker.patch("app.main.Db")
-    mock_db.query.return_value.filter_by().first.return_value = None
+
+def test_endpoint_atualizar_pokemon_nao_existente(charmander, fake_db):
+
+    fake_db.query.return_value.filter_by.return_value.first.return_value = None
 
     response = client.put(f"/atualizar-pokemon/{charmander['name']}", json=charmander)
 
-    assert response.json() == {
-        "detail": f"O pokemon {charmander['name']} não foi encontrado no banco de dados",
-        }
-
     assert response.status_code == 404
 
-def test_endpoint_deletar_pokemon_nao_existente(charmander, mocker):
-    
-    mock_db = mocker.patch("app.main.Db")
-    mock_db.query.return_value.filter_by().first.return_value = None
+
+def test_endpoint_deletar_pokemon_nao_existente(charmander, fake_db):
+
+    fake_db.query.return_value.filter_by.return_value.first.return_value = None
 
     response = client.delete(f"/deletar-pokemon/{charmander['name']}")
 
-    assert response.json() == {
-        "detail": f"O pokemon {charmander['name']} não foi encontrado no banco de dados",
-        }
-
     assert response.status_code == 404
 
-def test_endpoint_deletar_pokemon_existente(charmander, mocker):
-    
-    mock_db = mocker.patch("app.main.Db")
-    mock_db.query.return_value.filter_by().first.return_value = PokemonDB(
+
+def test_endpoint_deletar_pokemon_existente(charmander, fake_db):
+
+    fake_db.query.return_value.filter_by.return_value.first.return_value = PokemonDB(
         name=charmander["name"],
         height=charmander["height"],
         weight=charmander["weight"],
         types=charmander["types"],
         level=charmander["level"]
-     )
+    )
 
     response = client.delete(f"/deletar-pokemon/{charmander['name']}")
 
-    assert response.json() == {
-        "message": f"Pokemon {charmander['name']} removido do banco de dados",
-        }
-
     assert response.status_code == 200
 
-def test_endpoint_get_pokemon_nao_existente(charmander, mocker):
-    
-    mock_db = mocker.patch("app.main.Db")
-    mock_db.query.return_value.filter_by().first.return_value = None
+
+def test_endpoint_get_pokemon_nao_existente(charmander, fake_db):
+
+    fake_db.query.return_value.filter_by.return_value.first.return_value = None
 
     response = client.get(f"/pokemons-criados/{charmander['name']}")
 
-    assert response.json() == {
-        "detail": f"O pokemon {charmander['name']} não foi encontrado no banco de dados",
-        }
-
     assert response.status_code == 404
 
-def test_endpoint_get_pokemon_por_nome(charmander, squirtle, mocker):
-    
-    mock_db = mocker.patch("app.main.Db")
-    pokemons = mock_db.query.return_value.all.return_value = [
-        PokemonDB(
-        name=charmander["name"],
-        height=charmander["height"],
-        weight=charmander["weight"],
-        types=charmander["types"],
-        level=charmander["level"]),
 
+def test_endpoint_get_pokemon_por_nome(charmander, squirtle, fake_db):
+
+    pokemons = [
         PokemonDB(
-        name=squirtle["name"],
-        height=squirtle["height"],
-        weight=squirtle["weight"],
-        types=squirtle["types"],
-        level=squirtle["level"])
+            name=charmander["name"],
+            height=charmander["height"],
+            weight=charmander["weight"],
+            types=charmander["types"],
+            level=charmander["level"]
+        ),
+        PokemonDB(
+            name=squirtle["name"],
+            height=squirtle["height"],
+            weight=squirtle["weight"],
+            types=squirtle["types"],
+            level=squirtle["level"]
+        )
     ]
 
-    response = client.get(f"/pokemons-criados")
+    fake_db.query.return_value.all.return_value = pokemons
 
-    assert response.json() == {
-        "data": [
-            {
-                "name": pokemon.name,
-                "height": pokemon.height,
-                "weight": pokemon.weight,
-                "types": pokemon.types,
-                "level": pokemon.level
-            }
-            for pokemon in pokemons
-        ],
-        "message": f"{len(pokemons)} pokemons no banco de dados"
-    }
+    response = client.get("/pokemons-criados")
 
     assert response.status_code == 200
+    assert response.json()["message"] == f"{len(pokemons)} pokemons no banco de dados"

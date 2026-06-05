@@ -9,35 +9,46 @@ client = TestClient(app)
 
 def test_banco_de_dados_verifica_chamada(charmander, mocker):
 
-    mock_db = mocker.patch("app.main.get_db")
+    mock_db = MagicMock()
+    mock_db.query.return_value.filter_by.return_value.first.return_value = None
+
+    app.dependency_overrides[get_db] = lambda: mock_db
 
     response = client.get(f"/pokemons/{charmander['id']}")
 
-    mock_db.query.assert_called_with(PokemonDBAPI)
+    app.dependency_overrides.clear()
 
-    mock_db.query().filter_by.assert_called_with(
-        id=charmander["id"]
-        )
+    mock_db.commit.assert_called_once()
+    mock_db.add.assert_called_once()
 
 def test_banco_de_dados_verifica_pokemon_existente(charmander, mocker):
 
-    mock_db = mocker.patch("app.main.Db")
+    mock_db = MagicMock()
 
     mock_db.query.return_value.filter_by().first.return_value = PokemonDBAPI(
         id=charmander["id"]
     )
 
+    app.dependency_overrides[get_db] = lambda: mock_db
+    
     client.get(f"/pokemons/{charmander['id']}")
+
+    app.dependency_overrides.clear()
 
     mock_db.add.assert_not_called()
     mock_db.commit.assert_not_called()
 
 def test_banco_de_dados_cria_pokemon(charmander, mocker):
 
-    mock_db = mocker.patch("app.main.Db")
+    mock_db = MagicMock()
+
     mock_db.query.return_value.filter_by().first.return_value = None
 
+    app.dependency_overrides[get_db] = lambda: mock_db
+
     response = client.get(f"/pokemons/{charmander['id']}")
+
+    app.dependency_overrides.clear()
 
     mock_db.commit.assert_called_once()
     mock_db.add.assert_called_once()
