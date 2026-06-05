@@ -25,8 +25,8 @@ class Pokemon(BaseModel):
     types: list[str]
     level: int
 
-#Classe do tipo SQLAlchemy, usada para mapear a tabela de pokemons no banco de dados, e armazenar os pokemons criados pelo usuario
-class PokemonDB(Base):
+#Classe do tipo SQLAlchemy, usada para mapear a tabela de pokemons no banco de dados, e armazenar os pokemons da pokeapi.co
+class PokemonDBAPI(Base):
     __tablename__ = "pokemons"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(30))
@@ -35,6 +35,15 @@ class PokemonDB(Base):
     types: Mapped[list[str]] = mapped_column(JSON)
     level: Mapped[int] = mapped_column(Integer)
     sprites: Mapped[dict[str, str]] = mapped_column(JSON)
+
+#Classe do tipo SQLAlchemy, usada para mapear a tabela de pokemons no banco de dados, e armazenar os pokemons criados pelo usuario
+class PokemonDB(Base):
+    __tablename__ = "pokemons_user"
+    name: Mapped[str] = mapped_column(String(30), primary_key=True)
+    height: Mapped[int] = mapped_column(Integer)
+    weight: Mapped[int] = mapped_column(Integer)
+    types: Mapped[list[str]] = mapped_column(JSON)
+    level: Mapped[int] = mapped_column(Integer)
 
 #Criando as tabelas no banco de dados, caso elas ainda não existam
 Base.metadata.create_all(bind=engine)
@@ -81,7 +90,7 @@ def get_pokemon_by_id(id: int) -> dict:
     - dicionario com os dados do pokemon, incluindo nome, id, altura, peso, tipos, level e sprites, e uma mensagem indicando se o pokemon foi encontrado no banco de dados ou na API
     """
 
-    pokemon = Db.query(PokemonDB).filter_by(id=id).first()
+    pokemon = Db.query(PokemonDBAPI).filter_by(id=id).first()
 
     if pokemon:
         return {
@@ -98,6 +107,13 @@ def get_pokemon_by_id(id: int) -> dict:
         }
 
     response = requests.get(f"https://pokeapi.co/api/v2/pokemon/{id}")
+
+    if response.status_code != 200:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=f"Erro ao buscar pokemon com id {id} na pokeapi.co: {response.text}"
+        )
+
     data = response.json()
 
     weight = data["weight"]
@@ -109,7 +125,7 @@ def get_pokemon_by_id(id: int) -> dict:
     level = data["base_experience"] // 20 #fiz um sistema default que o pokemon upa 1 nivel a cada 20 de base_experience, mas isso é só um exemplo, pode ser qualquer coisa
     types = data["types"]
 
-    Db.add(PokemonDB(
+    Db.add(PokemonDBAPI(
         id=id,
         name=data["name"],
         height=height,
@@ -154,7 +170,7 @@ def create_pokemon(pokemon: Pokemon) -> dict:
     - dicionario com uma mensagem de confirmação indicando que o pokemon foi adicionado ao banco de dados, ou um erro caso o pokemon já exista no banco de dados
     """
 
-    pokemondb = Db.query(PokemonDB).filter_by(id=pokemon.name).first()
+    pokemondb = Db.query(PokemonDB).filter_by(name=pokemon.name).first()
 
     if pokemondb:
         raise HTTPException(
@@ -175,8 +191,8 @@ def create_pokemon(pokemon: Pokemon) -> dict:
         "message": f"Pokemon {pokemon.name} adicionado ao banco de dados",
     }
 
-@app.put("/atualizar-pokemon/{name}")
-def update_pokemon(name: str, pokemon: Pokemon) -> dict:
+@app.put("/atualizar-pokemon/{old_name}")
+def update_pokemon(old_name: str, pokemon: Pokemon) -> dict:
     """
     Endpoint /atualizar-pokemon/{name} deve atualiar as informações de um pokemon já existente no banco de dados, 
     usando o nnome do pokemon como parametro de rota e os dados atualizados passados pelo usuario no corpo da requisição
@@ -189,13 +205,14 @@ def update_pokemon(name: str, pokemon: Pokemon) -> dict:
     - dicionario com uma mensagem de confirmação indicando que as informações do pokemon foram atualizadas com sucesso, ou um erro caso o pokemon não exista no banco de dados
     """
     
-    pokemondb = Db.query(PokemonDB).filter_by(id=pokemon.name).first()
+    pokemondb = Db.query(PokemonDB).filter_by(name=old_name).first()
 
     if not pokemondb:
         raise HTTPException(
             status_code=404,
-            detail=f"O pokemon {name} não foi encontrado no banco de dados")
+            detail=f"O pokemon {old_name} não foi encontrado no banco de dados")
     
+    pokemondb.name = pokemon.name
     pokemondb.height = pokemon.height
     pokemondb.weight = pokemon.weight
     pokemondb.types = pokemon.types
@@ -204,7 +221,7 @@ def update_pokemon(name: str, pokemon: Pokemon) -> dict:
     Db.commit()
 
     return {
-        "message": f"Informações do pokemon {name} atualizadas com sucesso"
+        "message": f"Informações do pokemon {old_name} atualizadas com sucesso"
     }
 
 @app.delete("/deletar-pokemon/{name}")
@@ -219,7 +236,7 @@ def delete_pokmeon(name: str) -> dict:
     - dicionario com uma mensagem de confirmação indicando que o pokemon foi removido do banco de dados, ou um erro caso o pokemon não exista no banco de dados
     """
 
-    pokemondb = Db.query(PokemonDB).filter_by(id=name).first()
+    pokemondb = Db.query(PokemonDB).filter_by(name=name).first()
 
     if not pokemondb:
         raise HTTPException(
@@ -240,17 +257,15 @@ def get_pokemon_by_name(name: str) -> dict:
     Se o pokemon existir no banco de dados, deve retornar os dados do pokemon, caso contrário, deve retornar um erro indicando que o pokemon não foi encontrado no banco de dados
     """
     
-    pokemon = Db.query(PokemonDB).filter_by(id=name).first()
+    pokemon = Db.query(PokemonDB).filter_by(name=name).first()
 
     if pokemon:
         return {
             "name": pokemon.name,
-            "id": pokemon.id,
             "height": pokemon.height,
             "weight": pokemon.weight,
             "types": pokemon.types,
             "level": pokemon.level,
-            "sprites": pokemon.sprites,
 
             
             "message": "Pokemon encontrado no banco de dados"
@@ -268,6 +283,11 @@ def get_created_pokemons() -> dict:
 
     pokemons = Db.query(PokemonDB).all()
 
+    if not pokemons:
+        raise HTTPException(
+            status_code=404,
+            detail="Nenhum pokemon criado pelo usuario encontrado no banco de dados")   
+
     return {
         "data": [
             {
@@ -275,8 +295,7 @@ def get_created_pokemons() -> dict:
                 "height": pokemon.height,
                 "weight": pokemon.weight,
                 "types": pokemon.types,
-                "level": pokemon.level,
-                "sprites": pokemon.sprites,
+                "level": pokemon.level
             }
             for pokemon in pokemons
         ],
