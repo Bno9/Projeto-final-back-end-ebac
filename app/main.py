@@ -15,7 +15,7 @@ load_dotenv()
 app = FastAPI()
 
 engine = create_engine(
-    os.getenv("DATABASE_URL"),
+    DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///:memory:"),
     echo=True
 )
 SessionLocal = sessionmaker(autoflush=False, bind=engine)
