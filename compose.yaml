@@ -1,19 +1,10 @@
 services:
   api:
     build: .
-    ports:
-      - "8000:8000"
     env_file:
-      - .env
-    depends_on:
-      - db
+      - .env.docker
 
   db:
     image: postgres:17
     env_file:
-      - .env
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  postgres_data:
+      - .env.docker

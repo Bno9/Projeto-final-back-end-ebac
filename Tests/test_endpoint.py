@@ -219,8 +219,7 @@ def test_endpoint_get_pokemon_por_nome(charmander, squirtle, mocker):
                 "height": pokemon.height,
                 "weight": pokemon.weight,
                 "types": pokemon.types,
-                "level": pokemon.level,
-                "sprites": pokemon.sprites,
+                "level": pokemon.level
             }
             for pokemon in pokemons
         ],

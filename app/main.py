@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy import create_engine
 from sqlalchemy import Integer, JSON, String
 from sqlalchemy.orm import sessionmaker
@@ -8,6 +8,9 @@ from sqlalchemy.orm import DeclarativeBase
 from pydantic import BaseModel
 import requests
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI()
 
@@ -16,7 +19,13 @@ engine = create_engine(
     echo=True
 )
 SessionLocal = sessionmaker(autoflush=False, bind=engine)
-Db = SessionLocal()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 class Base(DeclarativeBase):
     pass
@@ -53,7 +62,7 @@ class PokemonDB(Base):
 Base.metadata.create_all(bind=engine)
 
 @app.get("/pokemons")
-def get_pokemons(limit: int = 10, offset: int = 10) -> dict:
+def get_pokemons(limit: int = 10, offset: int = 10, Db=Depends(get_db)) -> dict:
     """
     Endpoint /pokemons deve retornar um json de pokemons da pokeapi.co, com paginação usando os query params limit e offset
     
@@ -81,7 +90,7 @@ def get_pokemons(limit: int = 10, offset: int = 10) -> dict:
     }
 
 @app.get("/pokemons/{id}")
-def get_pokemon_by_id(id: int) -> dict:
+def get_pokemon_by_id(id: int, Db=Depends(get_db)) -> dict:
     """
     Endpoint /pokemons/{id} deve retornar um json de um pokemon especifico da pokeapi.co, usando o id do pokemon como parametro de rota.
     Se o pokemon já existir no banco de dados, deve retornar os dados do pokemon do banco de dados, caso contrário, deve buscar os dados na pokeapi.co, 
@@ -163,7 +172,7 @@ def get_pokemon_by_id(id: int) -> dict:
 #Como foram feitas duas propostas diferente de projeto e não ficou definido qual deveria ser feita, resolvi fazer as duas. Acima são os endpoints para buscar pokemons na pokeapi, e abaixo estão os endpoints para criar, atualizar, deletar e buscar pokemons criados pelo usuario.
 
 @app.post("/criar-pokemon")
-def create_pokemon(pokemon: Pokemon) -> dict:
+def create_pokemon(pokemon: Pokemon, Db=Depends(get_db)) -> dict:
     """
     Endpoint /criar-pokemon deve criar um pokemon novo no banco de dados usando os dados passados pelo usuario
     
@@ -196,7 +205,7 @@ def create_pokemon(pokemon: Pokemon) -> dict:
     }
 
 @app.put("/atualizar-pokemon/{old_name}")
-def update_pokemon(old_name: str, pokemon: Pokemon) -> dict:
+def update_pokemon(old_name: str, pokemon: Pokemon, Db=Depends(get_db)) -> dict:
     """
     Endpoint /atualizar-pokemon/{name} deve atualiar as informações de um pokemon já existente no banco de dados, 
     usando o nnome do pokemon como parametro de rota e os dados atualizados passados pelo usuario no corpo da requisição
@@ -229,7 +238,7 @@ def update_pokemon(old_name: str, pokemon: Pokemon) -> dict:
     }
 
 @app.delete("/deletar-pokemon/{name}")
-def delete_pokmeon(name: str) -> dict:
+def delete_pokmeon(name: str, Db=Depends(get_db)) -> dict:
     """
     Endpoint /deletar-pokemon/{name} deve deletar um pokemon do banco de dados, usando o nome do pokemon como parametro de rota
     
@@ -255,7 +264,7 @@ def delete_pokmeon(name: str) -> dict:
     }
 
 @app.get("/pokemons-criados/{name}")
-def get_pokemon_by_name(name: str) -> dict:
+def get_pokemon_by_name(name: str, Db=Depends(get_db)) -> dict:
     """
     Endpoint /pokemons-criados/{name} deve retornar um json de um pokemon criado pelo usuario, usando o nome do pokemon como parametro de rota.
     Se o pokemon existir no banco de dados, deve retornar os dados do pokemon, caso contrário, deve retornar um erro indicando que o pokemon não foi encontrado no banco de dados
@@ -280,7 +289,7 @@ def get_pokemon_by_name(name: str) -> dict:
         detail=f"O pokemon {name} não foi encontrado no banco de dados")
 
 @app.get("/pokemons-criados")
-def get_created_pokemons() -> dict:
+def get_created_pokemons(Db=Depends(get_db)) -> dict:
     """
     Endpoint /pokemons-criados deve retornar um json de todos os pokemons criados pelo usuario, buscando os dados no banco de dados
     """
