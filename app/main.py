@@ -7,10 +7,14 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import DeclarativeBase
 from pydantic import BaseModel
 import requests
+import os
 
 app = FastAPI()
 
-engine = create_engine("sqlite:///pokemon.db", echo=True)
+engine = create_engine(
+    os.getenv("DATABASE_URL"),
+    echo=True
+)
 SessionLocal = sessionmaker(autoflush=False, bind=engine)
 Db = SessionLocal()
 
