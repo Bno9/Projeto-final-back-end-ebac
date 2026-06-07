@@ -34,6 +34,147 @@ Documente os endpoints utilizando os recursos nativos do FastAPI.
 Configure corretamente as variáveis de ambiente.
 
 
-# Planejamento
 
-Minha ideia inicial é desenvolver a aplicação utilizando a metodologia TDD para diminuir a quantidade de erros e dor de cabeça ao longo do desenvolvimento, além de já garantir o requisito dos testes unitários. Não pretendo criar endpoints além dos que foram pedidos, mas colocarei autenticação em todos, mesmo que não seja necessário, para reforçar essa prática. Também realizarei commits pequenos para manter uma boa legibilidade e deixar clara cada alteração feita. Após a finalização da aplicação, criarei o Dockerfile e o docker-compose.yml.
+
+
+
+# Como utilizar a aplicação
+
+## Link da aplicação
+
+https://projeto-final-back-end-ebac.onrender.com/
+
+---
+
+# Métodos de utilização
+
+## 1. Utilizando o Swagger do FastAPI
+
+Acesse:
+
+https://projeto-final-back-end-ebac.onrender.com/docs
+
+Todas as rotas da API serão exibidas na interface do Swagger, permitindo visualizar a documentação e testar cada endpoint diretamente pelo navegador.
+
+
+## 2. Utilizando Postman ou Insomnia
+
+1. Copie a URL base da API:
+
+   https://projeto-final-back-end-ebac.onrender.com/
+
+2. Selecione o método HTTP adequado (GET, POST, PUT ou DELETE).
+
+3. Utilize uma das rotas descritas abaixo.
+
+4. Para rotas que exigem um corpo de requisição (Body), envie os dados em formato JSON.
+
+
+# Rotas disponíveis
+
+## GET /pokemons
+
+### Parâmetros opcionais
+
+- `limit` (padrão: 10)
+- `offset` (padrão: 10)
+
+Retorna uma lista de Pokémon da API pública PokeAPI com paginação.
+
+### Exemplo
+
+```http
+GET /pokemons?limit=10&offset=0
+```
+
+## GET /pokemons/{id}
+
+Retorna um Pokémon específico da PokeAPI utilizando o ID informado.
+
+### Exemplo
+
+```http
+GET /pokemons/25
+```
+
+
+## POST /criar-pokemon
+
+Permite criar um Pokémon personalizado no banco de dados da aplicação.
+
+Os dados devem ser enviados no corpo da requisição em formato JSON.
+
+### Exemplo
+
+```json
+{
+    "name": "pikachu",
+    "height": 4,
+    "weight": 60,
+    "types": ["electric"],
+    "level": 5
+}
+```
+
+
+## PUT /atualizar-pokemon/{nome}
+
+Atualiza os dados de um Pokémon já cadastrado.
+
+O nome do Pokémon deve ser informado na URL e os novos dados devem ser enviados no corpo da requisição.
+
+### Exemplo
+
+```http
+PUT /atualizar-pokemon/pikachu
+```
+
+---
+
+## DELETE /deletar-pokemon/{nome}
+
+Remove um Pokémon do banco de dados utilizando seu nome.
+
+### Exemplo
+
+```http
+DELETE /deletar-pokemon/pikachu
+```
+
+---
+
+## GET /pokemons-criados
+
+Retorna todos os Pokémon cadastrados pelos usuários.
+
+---
+
+## GET /pokemons-criados/{nome}
+
+Retorna um Pokémon específico cadastrado pelo usuário utilizando o nome informado.
+
+### Exemplo
+
+```http
+GET /pokemons-criados/pikachu
+```
+
+---
+
+# Observações
+
+- Os Pokémon retornados pelas rotas `/pokemons` e `/pokemons/{id}` são obtidos diretamente da PokeAPI, e salvo num banco de dados separado, para evitar requisições repetidas na pokeapi.
+- Os Pokémon criados através da rota `/criar-pokemon` são armazenados em outro banco de dados da aplicação.
+- Recomenda-se utilizar o Swagger (`/docs`) para testar a API de forma rápida e visualizar o formato esperado das requisições.
+
+
+# Tecnologias Utilizadas
+
+- Python
+- FastAPI
+- SQLAlchemy
+- PostgreSQL
+- Docker
+- Pytest
+- Render
+- PokeAPI
