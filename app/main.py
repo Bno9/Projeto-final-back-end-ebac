@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import DeclarativeBase
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 import requests
 import os
 from dotenv import load_dotenv
@@ -34,10 +34,20 @@ class Base(DeclarativeBase):
 #Classe do tipo Pydantic, usada para validar os dados de entrada do usuario na criação e atualização de pokemons criados pelo usuario
 class Pokemon(BaseModel):
     name: str
-    height: int
-    weight: int
-    types: list[str]
-    level: int
+
+    @field_validator("name")
+    @classmethod
+    def validar_nome(cls, value):
+
+        if not value.strip():
+            raise ValueError("Nome inválido")
+
+        return value
+    
+    height: int = Field(description="Altura do pokemon, deve ser um número inteiro positivo", ge=1)
+    weight: int = Field(description="Peso do pokemon, deve ser um número inteiro positivo", ge=1)
+    types: list[str] = Field(min_length=1, description="Lista de tipos do pokemon, deve conter pelo menos um tipo")
+    level: int = Field(description="Level permitido do pokemon", ge=1, le=100)
 
 #Classe do tipo SQLAlchemy, usada para mapear a tabela de pokemons no banco de dados, e armazenar os pokemons da pokeapi.co
 class PokemonDBAPI(Base):
@@ -183,6 +193,11 @@ def create_pokemon(pokemon: Pokemon, Db=Depends(get_db)) -> dict:
     Retorno:
     - dicionario com uma mensagem de confirmação indicando que o pokemon foi adicionado ao banco de dados, ou um erro caso o pokemon já exista no banco de dados
     """
+
+    if pokemon.level < 1 or pokemon.level > 100:
+        raise HTTPException(
+            status_code=400,
+            detail="O level do pokemon deve ser entre 1 e 100")
 
     pokemondb = Db.query(PokemonDB).filter_by(name=pokemon.name).first()
 
