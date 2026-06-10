@@ -75,7 +75,7 @@ Base.metadata.create_all(bind=engine)
 @app.get("/pokemons")
 def get_pokemons(limit: int = 10, offset: int = 10, Db=Depends(get_db)) -> dict:
     """
-    Endpoint /pokemons deve retornar um json de pokemons da pokeapi.co, com paginação usando os query params limit e offset
+    Retorna um json de pokemons da pokeapi.co, com paginação usando os query params limit e offset
     
     Parâmetros:
     - limit: número de pokemons a serem retornados (padrão: 10)
@@ -103,7 +103,7 @@ def get_pokemons(limit: int = 10, offset: int = 10, Db=Depends(get_db)) -> dict:
 @app.get("/pokemons/{id}")
 def get_pokemon_by_id(id: int, Db=Depends(get_db)) -> dict:
     """
-    Endpoint /pokemons/{id} deve retornar um json de um pokemon especifico da pokeapi.co, usando o id do pokemon como parametro de rota.
+    Retorna um json de um pokemon especifico da pokeapi.co, usando o id do pokemon como parametro de rota.
     Se o pokemon já existir no banco de dados, deve retornar os dados do pokemon do banco de dados, caso contrário, deve buscar os dados na pokeapi.co, 
     adicionar ao banco de dados e retornar os dados do pokemon
       
@@ -185,7 +185,7 @@ def get_pokemon_by_id(id: int, Db=Depends(get_db)) -> dict:
 @app.post("/criar-pokemon")
 def create_pokemon(pokemon: Pokemon, Db=Depends(get_db)) -> dict:
     """
-    Endpoint /criar-pokemon deve criar um pokemon novo no banco de dados usando os dados passados pelo usuario
+    Cria um pokemon novo no banco de dados usando os dados passados pelo usuario
     
     Parametros:
     - pokemon: objeto do tipo Pokemon, contendo os dados do pokemon a ser criado, incluindo nome, altura, peso, tipos e level
@@ -193,11 +193,6 @@ def create_pokemon(pokemon: Pokemon, Db=Depends(get_db)) -> dict:
     Retorno:
     - dicionario com uma mensagem de confirmação indicando que o pokemon foi adicionado ao banco de dados, ou um erro caso o pokemon já exista no banco de dados
     """
-
-    if pokemon.level < 1 or pokemon.level > 100:
-        raise HTTPException(
-            status_code=400,
-            detail="O level do pokemon deve ser entre 1 e 100")
 
     pokemondb = Db.query(PokemonDB).filter_by(name=pokemon.name).first()
 
@@ -223,7 +218,7 @@ def create_pokemon(pokemon: Pokemon, Db=Depends(get_db)) -> dict:
 @app.put("/atualizar-pokemon/{old_name}")
 def update_pokemon(old_name: str, pokemon: Pokemon, Db=Depends(get_db)) -> dict:
     """
-    Endpoint /atualizar-pokemon/{name} deve atualiar as informações de um pokemon já existente no banco de dados, 
+    Atualiza as informações de um pokemon já existente no banco de dados, 
     usando o nnome do pokemon como parametro de rota e os dados atualizados passados pelo usuario no corpo da requisição
     
     Parametros: 
@@ -256,7 +251,7 @@ def update_pokemon(old_name: str, pokemon: Pokemon, Db=Depends(get_db)) -> dict:
 @app.delete("/deletar-pokemon/{name}")
 def delete_pokmeon(name: str, Db=Depends(get_db)) -> dict:
     """
-    Endpoint /deletar-pokemon/{name} deve deletar um pokemon do banco de dados, usando o nome do pokemon como parametro de rota
+    Exclui um pokemon do banco de dados, usando o nome do pokemon como parametro de rota
     
     Parametros:
     - name: nome do pokemon a ser deletado
@@ -282,7 +277,7 @@ def delete_pokmeon(name: str, Db=Depends(get_db)) -> dict:
 @app.get("/pokemons-criados/{name}")
 def get_pokemon_by_name(name: str, Db=Depends(get_db)) -> dict:
     """
-    Endpoint /pokemons-criados/{name} deve retornar um json de um pokemon criado pelo usuario, usando o nome do pokemon como parametro de rota.
+    Retorna um json de um pokemon criado pelo usuario, usando o nome do pokemon como parametro de rota.
     Se o pokemon existir no banco de dados, deve retornar os dados do pokemon, caso contrário, deve retornar um erro indicando que o pokemon não foi encontrado no banco de dados
     """
     
@@ -307,7 +302,7 @@ def get_pokemon_by_name(name: str, Db=Depends(get_db)) -> dict:
 @app.get("/pokemons-criados")
 def get_created_pokemons(Db=Depends(get_db)) -> dict:
     """
-    Endpoint /pokemons-criados deve retornar um json de todos os pokemons criados pelo usuario, buscando os dados no banco de dados
+    Retorna um json de todos os pokemons criados pelo usuario, buscando os dados no banco de dados
     """
 
     pokemons = Db.query(PokemonDB).all()
