@@ -170,7 +170,7 @@ def test_endpoint_get_pokemon_nao_existente(charmander, fake_db):
 
     fake_db.query.return_value.filter_by.return_value.first.return_value = None
 
-    response = client.get(f"/pokemons-criados/{charmander['name']}")
+    response = client.get(f"/pokemon/{charmander['name']}")
 
     assert response.status_code == 404
 
@@ -196,7 +196,7 @@ def test_endpoint_get_pokemon_por_nome(charmander, squirtle, fake_db):
 
     fake_db.query.return_value.all.return_value = pokemons
 
-    response = client.get("/pokemons-criados")
+    response = client.get("/pokemons")
 
     assert response.status_code == 200
     assert response.json()["message"] == f"{len(pokemons)} pokemons no banco de dados"

@@ -97,7 +97,7 @@ def delete_pokmeon(name: str, Db=Depends(get_db)) -> dict:
         "message": f"Pokemon {name} removido do banco de dados"
     }
 
-@router.get("/pokemons-criados/{name}", tags=["Usuario"])
+@router.get("/pokemon/{name}", tags=["Usuario"])
 def get_pokemon_by_name(name: str, Db=Depends(get_db)) -> dict:
     """
     Retorna um json de um pokemon criado pelo usuario, usando o nome do pokemon como parametro de rota.
@@ -122,7 +122,7 @@ def get_pokemon_by_name(name: str, Db=Depends(get_db)) -> dict:
         status_code=404,
         detail=f"O pokemon {name} não foi encontrado no banco de dados")
 
-@router.get("/pokemons-criados", tags=["Usuario"])
+@router.get("/pokemons", tags=["Usuario"])
 def get_created_pokemons(Db=Depends(get_db)) -> dict:
     """
     Retorna um json de todos os pokemons criados pelo usuario, buscando os dados no banco de dados
