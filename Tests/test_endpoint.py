@@ -1,6 +1,8 @@
 import pytest
 from fastapi.testclient import TestClient
-from app.main import app, PokemonDB, get_db
+from app.main import app
+from database.modelos import PokemonDB
+from database.db import get_db
 from unittest.mock import MagicMock
 
 client = TestClient(app)
@@ -70,20 +72,20 @@ def override_dependency(fake_db):
 # TESTES
 # -------------------------
 
-def test_endpoint_all_pokemons(fake_db):
+def test_endpoint_all_pokemons_from_pokeapi(fake_db):
 
     fake_db.query.return_value.all.return_value = []
 
-    response = client.get("/pokemons")
+    response = client.get("/pokeapi")
 
     assert response.status_code == 200
 
 
-def test_endpoint_pokemon_por_id(charmander, fake_db):
+def test_endpoint_pokemon_per_id_from_pokeapi(charmander, fake_db):
 
     fake_db.query.return_value.filter_by.return_value.first.return_value = None
 
-    response = client.get(f"/pokemons/{charmander['id']}")
+    response = client.get(f"/pokeapi/{charmander['id']}")
 
     assert response.status_code == 200
     assert response.json()["id"] == charmander["id"]
