@@ -5,7 +5,7 @@ from database.db import get_db
 
 router = APIRouter()
 
-@router.post("/criar-pokemon")
+@router.post("/criar-pokemon", tags=["Usuario"])
 def create_pokemon(pokemon: Pokemon, Db=Depends(get_db)) -> dict:
     """
     Cria um pokemon novo no banco de dados usando os dados passados pelo usuario
@@ -38,7 +38,7 @@ def create_pokemon(pokemon: Pokemon, Db=Depends(get_db)) -> dict:
         "message": f"Pokemon {pokemon.name} adicionado ao banco de dados",
     }
 
-@router.put("/atualizar-pokemon/{old_name}")
+@router.put("/atualizar-pokemon/{old_name}", tags=["Usuario"])
 def update_pokemon(old_name: str, pokemon: Pokemon, Db=Depends(get_db)) -> dict:
     """
     Atualiza as informações de um pokemon já existente no banco de dados, 
@@ -71,7 +71,7 @@ def update_pokemon(old_name: str, pokemon: Pokemon, Db=Depends(get_db)) -> dict:
         "message": f"Informações do pokemon {old_name} atualizadas com sucesso"
     }
 
-@router.delete("/deletar-pokemon/{name}")
+@router.delete("/deletar-pokemon/{name}", tags=["Usuario"])
 def delete_pokmeon(name: str, Db=Depends(get_db)) -> dict:
     """
     Exclui um pokemon do banco de dados, usando o nome do pokemon como parametro de rota
@@ -97,7 +97,7 @@ def delete_pokmeon(name: str, Db=Depends(get_db)) -> dict:
         "message": f"Pokemon {name} removido do banco de dados"
     }
 
-@router.get("/pokemons-criados/{name}")
+@router.get("/pokemons-criados/{name}", tags=["Usuario"])
 def get_pokemon_by_name(name: str, Db=Depends(get_db)) -> dict:
     """
     Retorna um json de um pokemon criado pelo usuario, usando o nome do pokemon como parametro de rota.
@@ -122,7 +122,7 @@ def get_pokemon_by_name(name: str, Db=Depends(get_db)) -> dict:
         status_code=404,
         detail=f"O pokemon {name} não foi encontrado no banco de dados")
 
-@router.get("/pokemons-criados")
+@router.get("/pokemons-criados", tags=["Usuario"])
 def get_created_pokemons(Db=Depends(get_db)) -> dict:
     """
     Retorna um json de todos os pokemons criados pelo usuario, buscando os dados no banco de dados

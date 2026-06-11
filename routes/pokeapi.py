@@ -4,8 +4,9 @@ from fastapi import Depends, APIRouter, HTTPException
 import requests
 
 router = APIRouter()
+#todas rotas aqui tem um prefixo de "pokeapi", então na hora de testar a rota, coloque /pokeapi/ antes 
 
-@router.get("/pokeapi")
+@router.get("/all", tags=["PokeAPI"])
 def get_pokemons(limit: int = 10, offset: int = 10, Db=Depends(get_db)) -> dict:
     """
     Retorna um json de pokemons da pokeapi.co, com paginação usando os query params limit e offset
@@ -33,7 +34,7 @@ def get_pokemons(limit: int = 10, offset: int = 10, Db=Depends(get_db)) -> dict:
         }
     }
 
-@router.get("/pokeapi/{id}")
+@router.get("/{id}", tags=["PokeAPI"])
 def get_pokemon_by_id(id: int, Db=Depends(get_db)) -> dict:
     """
     Retorna um json de um pokemon especifico da pokeapi.co, usando o id do pokemon como parametro de rota.
