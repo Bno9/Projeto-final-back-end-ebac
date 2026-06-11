@@ -1,7 +1,4 @@
 # Projeto-final-back-end-ebac
-Projeto de finalização do curso back-end com python da EBAC
-
-Como é um projeto onde colocarei tudo que aprendi na prática, decidi documentar não só o funcionamento da API, mas também meu mapa mental da construção dela.
 
 # Proposta do curso
 
