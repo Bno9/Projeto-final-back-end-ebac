@@ -6,13 +6,12 @@ from sqlalchemy.orm import DeclarativeBase
 from pydantic import BaseModel, Field, field_validator
 from database.db import engine
 
-
 class Base(DeclarativeBase):
     pass
 
 #Classe do tipo Pydantic, usada para validar os dados de entrada do usuario na criação e atualização de pokemons criados pelo usuario
 class Pokemon(BaseModel):
-    name: str
+    name: str = Field(description="Nome do pokemon", examples=["Charizard"])
 
     @field_validator("name")
     @classmethod
@@ -23,10 +22,10 @@ class Pokemon(BaseModel):
 
         return value
     
-    height: int = Field(description="Altura do pokemon, deve ser um número inteiro positivo", ge=1)
-    weight: int = Field(description="Peso do pokemon, deve ser um número inteiro positivo", ge=1)
-    types: list[str] = Field(min_length=1, description="Lista de tipos do pokemon, deve conter pelo menos um tipo")
-    level: int = Field(description="Level permitido do pokemon", ge=1, le=100)
+    height: float = Field(description="Altura do pokemon, deve ser um número inteiro positivo", ge=1, examples=["5.4"])
+    weight: float = Field(description="Peso do pokemon, deve ser um número inteiro positivo", ge=1, examples=["200"])
+    types: list[str] = Field(min_length=1, description="Lista de tipos do pokemon, deve conter pelo menos um tipo", examples=[["fogo", "dragão"]])
+    level: int = Field(description="Level permitido do pokemon", ge=1, le=100, examples=["36"], default=1)
 
 #Classe do tipo SQLAlchemy, usada para mapear a tabela de pokemons no banco de dados, e armazenar os pokemons da pokeapi.co
 class PokemonDBAPI(Base):
