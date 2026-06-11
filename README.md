@@ -72,7 +72,7 @@ Todas as rotas da API serão exibidas na interface do Swagger, permitindo visual
 
 # Rotas disponíveis
 
-## GET /pokemons
+## GET /pokeapi/all
 
 ### Parâmetros opcionais
 
@@ -84,17 +84,17 @@ Retorna uma lista de Pokémon da API pública PokeAPI com paginação.
 ### Exemplo
 
 ```http
-GET /pokemons?limit=10&offset=0
+GET /pokeapi/all?limit=10&offset=0
 ```
 
-## GET /pokemons/{id}
+## GET /pokeapi/{id}
 
 Retorna um Pokémon específico da PokeAPI utilizando o ID informado.
 
 ### Exemplo
 
 ```http
-GET /pokemons/25
+GET /pokeapi/25
 ```
 
 
@@ -163,7 +163,7 @@ GET /pokemons-criados/pikachu
 
 # Observações
 
-- Os Pokémon retornados pelas rotas `/pokemons` e `/pokemons/{id}` são obtidos diretamente da PokeAPI, e salvo num banco de dados separado, para evitar requisições repetidas na pokeapi.
+- Os Pokémon retornados pelas rotas `/pokeapi/all` e `/pokeapi/{id}` são obtidos diretamente da PokeAPI, e salvo num banco de dados separado, para evitar requisições repetidas na pokeapi (futuramente sera trocado por um cache com redis).
 - Os Pokémon criados através da rota `/criar-pokemon` são armazenados em outro banco de dados da aplicação.
 - Recomenda-se utilizar o Swagger (`/docs`) para testar a API de forma rápida e visualizar o formato esperado das requisições.
 
