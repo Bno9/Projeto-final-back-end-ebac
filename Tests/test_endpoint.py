@@ -76,7 +76,7 @@ def test_endpoint_all_pokemons_from_pokeapi(fake_db):
 
     fake_db.query.return_value.all.return_value = []
 
-    response = client.get("/pokeapi")
+    response = client.get("/pokeapi/all")
 
     assert response.status_code == 200
 
