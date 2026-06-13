@@ -8,3 +8,6 @@ services:
     image: postgres:17
     env_file:
       - .env.docker
+  
+  redis:
+    image: redis:7-alpine

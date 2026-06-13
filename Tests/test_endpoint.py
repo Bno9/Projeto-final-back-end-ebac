@@ -17,8 +17,8 @@ def charmander():
     return {
         "name": "charmander",
         "id": 4,
-        "height": 6,
-        "weight": 85,
+        "height": 6.0,
+        "weight": 85.0,
         "types": ["fire"],
         "level": 3,
         "sprites": {
@@ -88,6 +88,7 @@ def test_endpoint_pokemon_per_id_from_pokeapi(charmander, fake_db):
     response = client.get(f"/pokeapi/{charmander['id']}")
 
     assert response.status_code == 200
+    assert type(response.json()["id"]) == int
     assert response.json()["id"] == charmander["id"]
 
 
