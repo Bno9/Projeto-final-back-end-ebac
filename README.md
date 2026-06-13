@@ -160,8 +160,8 @@ GET /pokemons-criados/pikachu
 
 # Observações
 
-- Os Pokémon retornados pelas rotas `/pokeapi/all` e `/pokeapi/{id}` são obtidos diretamente da PokeAPI, e salvo num banco de dados separado, para evitar requisições repetidas na pokeapi (futuramente sera trocado por um cache com redis).
-- Os Pokémon criados através da rota `/criar-pokemon` são armazenados em outro banco de dados da aplicação.
+- Os Pokémon retornados pelas rotas `/pokeapi/all` e `/pokeapi/{id}` são obtidos diretamente da PokeAPI, e cacheados com redis.
+- Os Pokémon criados através da rota `/criar-pokemon` são armazenados em um banco de dados.
 - Recomenda-se utilizar o Swagger (`/docs`) para testar a API de forma rápida e visualizar o formato esperado das requisições.
 
 
@@ -175,3 +175,4 @@ GET /pokemons-criados/pikachu
 - Pytest
 - Render
 - PokeAPI
+- Redis
