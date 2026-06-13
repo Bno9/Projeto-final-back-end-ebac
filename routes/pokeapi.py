@@ -75,12 +75,12 @@ def get_pokemon_by_id(id: int) -> dict:
     if pokemon:
         return {
             "name": pokemon["name"],
-            "id": pokemon["id"],
-            "height": pokemon["height"],
-            "weight": pokemon["weight"],
+            "id": int(pokemon["id"]),
+            "height": float(pokemon["height"]),
+            "weight": float(pokemon["weight"]),
             "types": json.loads(pokemon["types"]),
-            "level": pokemon["level"],
-            "sprites": json.loads(pokemon["sprite"]),
+            "level": int(pokemon["level"]),
+            "sprites": json.loads(pokemon["sprites"]),
 
             
             "message": f"Pokemon encontrado no cache e retornado em {time.time() - comeco:.2f} segundos"
@@ -110,11 +110,11 @@ def get_pokemon_by_id(id: int) -> dict:
         mapping={
             "name": data["name"],
             "id": id,
-            "height": height,
-            "weight": weight,
+            "height": float(height),
+            "weight": float(weight),
             "types": json.dumps([t["type"]["name"] for t in types]),
             "level": level,
-            "sprite": json.dumps({
+            "sprites": json.dumps({
                 "front_default": front_default,
                 "back_default": back_default
             })
@@ -126,8 +126,8 @@ def get_pokemon_by_id(id: int) -> dict:
     return {
         "name": data["name"],
         "id": id,
-        "height": height,
-        "weight": weight,
+        "height": float(height),
+        "weight": float(weight),
         "types": [t["type"]["name"] for t in types],
         "level": level,
         "sprites": {
