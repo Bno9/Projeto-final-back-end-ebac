@@ -7,6 +7,7 @@ import redis
 
 load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///:memory:")
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
 
 engine = create_engine(
     DATABASE_URL,
@@ -21,4 +22,4 @@ def get_db():
     finally:
         db.close()
 
-r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r = redis.Redis.from_url(REDIS_URL, decode_responses=True)
