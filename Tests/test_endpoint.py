@@ -32,7 +32,6 @@ def charmander():
 def squirtle():
     return {
         "name": "squirtle",
-        "id": 7,
         "height": 5,
         "weight": 90,
         "types": ["water"],

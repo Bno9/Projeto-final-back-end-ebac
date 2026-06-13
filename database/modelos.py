@@ -27,17 +27,6 @@ class Pokemon(BaseModel):
     types: list[str] = Field(min_length=1, description="Lista de tipos do pokemon, deve conter pelo menos um tipo", examples=[["fogo", "dragão"]])
     level: int = Field(description="Level permitido do pokemon", ge=1, le=100, examples=["36"], default=1)
 
-#Classe do tipo SQLAlchemy, usada para mapear a tabela de pokemons no banco de dados, e armazenar os pokemons da pokeapi.co
-class PokemonDBAPI(Base):
-    __tablename__ = "pokemons"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(30))
-    height: Mapped[int] = mapped_column(Integer)
-    weight: Mapped[int] = mapped_column(Integer)
-    types: Mapped[list[str]] = mapped_column(JSON)
-    level: Mapped[int] = mapped_column(Integer)
-    sprites: Mapped[dict[str, str]] = mapped_column(JSON)
-
 #Classe do tipo SQLAlchemy, usada para mapear a tabela de pokemons no banco de dados, e armazenar os pokemons criados pelo usuario
 class PokemonDB(Base):
     __tablename__ = "pokemons_user"

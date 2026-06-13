@@ -1,8 +1,8 @@
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
-from database.db import get_db
-from database.modelos import PokemonDBAPI
+from database.db import get_db, r
+from database.modelos import PokemonDB
 from unittest.mock import MagicMock
 from Tests.test_endpoint import charmander
 
@@ -15,7 +15,7 @@ def test_banco_de_dados_verifica_chamada(charmander, mocker):
 
     app.dependency_overrides[get_db] = lambda: mock_db
 
-    response = client.get(f"/pokeapi/{charmander['id']}")
+    response = client.post(f"/criar-pokemon", json=charmander)
 
     app.dependency_overrides.clear()
 
@@ -26,13 +26,17 @@ def test_banco_de_dados_verifica_pokemon_existente(charmander, mocker):
 
     mock_db = MagicMock()
 
-    mock_db.query.return_value.filter_by().first.return_value = PokemonDBAPI(
-        id=charmander["id"]
+    mock_db.query.return_value.filter_by().first.return_value = PokemonDB(
+        name=charmander["name"],
+        height=charmander["height"],
+        weight=charmander["weight"],
+        types=charmander["types"],
+        level=charmander["level"]
     )
 
     app.dependency_overrides[get_db] = lambda: mock_db
     
-    client.get(f"/pokeapi/{charmander['id']}")
+    client.post(f"/criar-pokemon", json=charmander)
 
     app.dependency_overrides.clear()
 
@@ -47,7 +51,7 @@ def test_banco_de_dados_cria_pokemon(charmander, mocker):
 
     app.dependency_overrides[get_db] = lambda: mock_db
 
-    response = client.get(f"/pokeapi/{charmander['id']}")
+    response = client.post(f"/criar-pokemon", json=charmander)
 
     app.dependency_overrides.clear()
 
