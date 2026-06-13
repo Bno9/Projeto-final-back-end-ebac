@@ -72,18 +72,22 @@ def override_dependency(fake_db):
 # TESTES
 # -------------------------
 
-def test_endpoint_all_pokemons_from_pokeapi(fake_db):
+def test_endpoint_all_pokemons_from_pokeapi(mocker):
 
-    fake_db.query.return_value.all.return_value = []
+    mock_redis = MagicMock()
+    mocker.patch("routes.pokeapi.r", mock_redis)
+    mock_redis.get.return_value = None
 
     response = client.get("/pokeapi/all")
 
     assert response.status_code == 200
 
 
-def test_endpoint_pokemon_per_id_from_pokeapi(charmander, fake_db):
+def test_endpoint_pokemon_per_id_from_pokeapi(charmander, mocker):
 
-    fake_db.query.return_value.filter_by.return_value.first.return_value = None
+    mock_redis = MagicMock()
+    mocker.patch("routes.pokeapi.r", mock_redis)
+    mock_redis.hgetall.return_value = {}
 
     response = client.get(f"/pokeapi/{charmander['id']}")
 
