@@ -4,6 +4,13 @@ const infopokeapi = document.getElementById("infopokeapi");
 const id_pokeapi = document.getElementById("id_poke");
 const front = document.getElementById("front_img_pokemon");
 const back = document.getElementById("back_img_pokemon");
+const botao_tema = document.getElementById("botao-tema");
+const body = document.body;
+
+botao_tema.addEventListener("click", () => {
+
+    body.classList.toggle("dark-mode")
+})
 
 botao_pokeapi_id.addEventListener("click", () => {
     const id = Number(id_pokeapi.value);
@@ -16,7 +23,7 @@ botao_pokeapi_id.addEventListener("click", () => {
         .then(response => response.json())
         .then(data => {
             infopokeapi.textContent = JSON.stringify(data, null, 2);
-            infopokeapi.style.border = "1px solid black";
+            infopokeapi.classList.add("info-visible");
             front.src = data.sprites.front_default;
             back.src = data.sprites.back_default;
             front.style.display = "block";
@@ -27,9 +34,9 @@ botao_pokeapi_id.addEventListener("click", () => {
 botao_all_pokeapi.addEventListener("click", () => {
     fetch(`http://0.0.0.0:8000/pokeapi/all`)
         .then(response => response.json())
-        .then(data => {
+        .then(data => { 
             infopokeapi.textContent = JSON.stringify(data, null, 2);
-            infopokeapi.style.border = "1px solid black";
+            infopokeapi.classList.add("info-visible");
             front.style.display = "none";
             back.style.display = "none";
 
