@@ -2,9 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes.pokeapi import router as rota_pokeapi
 from routes.user_poke import router as rota_usuario
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
+app.mount("/Frontend", StaticFiles(directory="Frontend"), name="frontend")
 app.add_middleware(CORSMiddleware,
                    allow_origins=[
         "http://127.0.0.1:5500",
