@@ -1,16 +1,55 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: gray;
+    background-color: #f5f5f5;  
+    color: black;
 }
 
-.container {
+.dark-mode {
+    background-color: black;
+    color: white;
+}
+
+.dark-mode button {
+    background-color: #444;
+    color: white;
+}
+
+.dark-mode input {
+    background-color: #333;
+    color: white;
+    border: 1px solid #666;
+}
+
+.dark-mode #infopokeapi {
+    background-color: #2a2a2a;
+    color: white;
+}
+
+.dark-mode .info-visible {
+    border-color: white;
+}
+
+.pokeapibuttons {
     display: flex;
     flex-direction: column;
     gap: 10px;
 
     width: 80%;
-    max-width: 1000px;
+    max-width: 300px;
     margin: 30px auto;
+}
+
+#botao-tema {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+
+    padding: 10px;
+    min-width: auto;
+}
+
+#titlepokeapi {
+    text-align: center;
 }
 
 .imagens {
@@ -24,16 +63,26 @@ img {
 }
 
 button {
-    padding: 10px;
+    padding: 30px;
     cursor: pointer;
+    color: white;
+    background-color: black;
+    border-radius: 18px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: large;
+    min-width: 200px;
 }
 
 input {
     padding: 10px;
-
 }
 
-#titulo {
+#infopokeapi.info-visible {
     border: 1px solid black;
-    padding: 10px;
+    font-size: large;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.dark-mode #infopokeapi.info-visible {
+    border: 1px solid white;
 }

@@ -1,32 +1,44 @@
-const botao1 = document.getElementById("btn1");
-const botao2 = document.getElementById("btn2");
-const titulo = document.getElementById("titulo");
-const id_pokeapi = document.getElementById("id_poke")
+const botao_all_pokeapi = document.getElementById("btn1");
+const botao_pokeapi_id = document.getElementById("btn2");
+const infopokeapi = document.getElementById("infopokeapi");
+const id_pokeapi = document.getElementById("id_poke");
+const front = document.getElementById("front_img_pokemon");
+const back = document.getElementById("back_img_pokemon");
+const botao_tema = document.getElementById("botao-tema");
+const body = document.body;
 
+botao_tema.addEventListener("click", () => {
 
-botao2.addEventListener("click", () => {
+    body.classList.toggle("dark-mode")
+})
+
+botao_pokeapi_id.addEventListener("click", () => {
     const id = Number(id_pokeapi.value);
 
     if(id <= 0){
         return;
         }
 
-    fetch(`http://0.0.0.0:8000/pokeapi/${id}`)  
+    fetch(`https://projeto-final-back-end-ebac.onrender.com/pokeapi/${id}`)  //atualmente busco no local, mas preciso mudar pra buscar no render
         .then(response => response.json())
         .then(data => {
-            titulo.textContent = JSON.stringify(data, null, 2);
-            document.getElementById("front_img_pokemon").src = data.sprites.front_default;
-            document.getElementById("back_img_pokemon").src = data.sprites.back_default;
-
+            infopokeapi.textContent = JSON.stringify(data, null, 2);
+            infopokeapi.classList.add("info-visible");
+            front.src = data.sprites.front_default;
+            back.src = data.sprites.back_default;
+            front.style.display = "block";
+            back.style.display = "block";
         });
 });
 
-botao1.addEventListener("click", () => {
-    fetch(`http://0.0.0.0:8000/pokeapi/all`)
+botao_all_pokeapi.addEventListener("click", () => {
+    fetch(`https://projeto-final-back-end-ebac.onrender.com/pokeapi/all`)
         .then(response => response.json())
-        .then(data => {
-            titulo.textContent = JSON.stringify(data, null, 2);
-            document.getElementById("front_img_pokemon").src = null;
-            document.getElementById("back_img_pokemon").src = null;
+        .then(data => { 
+            infopokeapi.textContent = JSON.stringify(data, null, 2);
+            infopokeapi.classList.add("info-visible");
+            front.style.display = "none";
+            back.style.display = "none";
+
         });
 });
