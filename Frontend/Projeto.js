@@ -19,7 +19,7 @@ botao_pokeapi_id.addEventListener("click", () => {
         return;
         }
 
-    fetch(`http://0.0.0.0:8000/pokeapi/${id}`)  //atualmente busco no local, mas preciso mudar pra buscar no render
+    fetch(`https://projeto-final-back-end-ebac.onrender.com/pokeapi/${id}`)  //atualmente busco no local, mas preciso mudar pra buscar no render
         .then(response => response.json())
         .then(data => {
             infopokeapi.textContent = JSON.stringify(data, null, 2);
@@ -32,7 +32,7 @@ botao_pokeapi_id.addEventListener("click", () => {
 });
 
 botao_all_pokeapi.addEventListener("click", () => {
-    fetch(`http://0.0.0.0:8000/pokeapi/all`)
+    fetch(`https://projeto-final-back-end-ebac.onrender.com/pokeapi/all`)
         .then(response => response.json())
         .then(data => { 
             infopokeapi.textContent = JSON.stringify(data, null, 2);
