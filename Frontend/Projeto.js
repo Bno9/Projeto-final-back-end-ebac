@@ -7,8 +7,8 @@ const back = document.getElementById("back_img_pokemon");
 const botao_tema = document.getElementById("botao-tema");
 const body = document.body;
 
-botao_tema.addEventListener("click", () => {
 
+botao_tema.addEventListener("click", () => {
     body.classList.toggle("dark-mode")
 })
 
@@ -19,7 +19,7 @@ botao_pokeapi_id.addEventListener("click", () => {
         return;
         }
 
-    fetch(`https://projeto-final-back-end-ebac.onrender.com/pokeapi/${id}`)  //atualmente busco no local, mas preciso mudar pra buscar no render
+    fetch(`https://projeto-final-back-end-ebac.onrender.com/pokeapi/${id}`)
         .then(response => response.json())
         .then(data => {
             infopokeapi.textContent = JSON.stringify(data, null, 2);
@@ -32,7 +32,16 @@ botao_pokeapi_id.addEventListener("click", () => {
 });
 
 botao_all_pokeapi.addEventListener("click", () => {
-    fetch(`https://projeto-final-back-end-ebac.onrender.com/pokeapi/all`)
+
+    const limit = document.getElementById("limit");
+    const offset = document.getElementById("offset");
+
+    if(limit.value <= 0 || offset < 0){
+        infopokeapi.textContent = "Insira um valor maior que 0 para limite e offset"
+        return
+    }
+
+    fetch(`https://projeto-final-back-end-ebac.onrender.com/pokeapi/all?limit=${limit.value}&offset=${offset.value}`)
         .then(response => response.json())
         .then(data => { 
             infopokeapi.textContent = JSON.stringify(data, null, 2);
@@ -42,3 +51,6 @@ botao_all_pokeapi.addEventListener("click", () => {
 
         });
 });
+
+
+// falta todas rotas de criação de pokemon (criar, atualizar, deletar, ver)
