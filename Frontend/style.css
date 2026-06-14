@@ -1,16 +1,29 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: gray;
+    background-color: #f5f5f5;  
 }
 
-.container {
+.pokeapibuttons {
     display: flex;
     flex-direction: column;
     gap: 10px;
 
     width: 80%;
-    max-width: 1000px;
+    max-width: 300px;
     margin: 30px auto;
+}
+
+#botao-tema {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+
+    padding: 10px;
+    min-width: auto;
+}
+
+#titlepokeapi {
+    text-align: center;
 }
 
 .imagens {
@@ -24,8 +37,14 @@ img {
 }
 
 button {
-    padding: 10px;
+    padding: 30px;
     cursor: pointer;
+    color: white;
+    background-color: black;
+    border-radius: 5%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: large;
+    min-width: 200px;
 }
 
 input {
@@ -33,7 +52,6 @@ input {
 
 }
 
-#titulo {
-    border: 1px solid black;
+#infopokeapi {
     padding: 10px;
 }
