@@ -1,9 +1,14 @@
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import FileResponse
 from database.modelos import Pokemon, PokemonDB
 from database.db import get_db
 
 router = APIRouter()
+
+@router.get("/") #só um teste. Não pretendo misturar o front com o back end
+def home():
+    return FileResponse("Frontend/index.html")
 
 @router.post("/criar-pokemon", tags=["Usuario"])
 def create_pokemon(pokemon: Pokemon, Db=Depends(get_db)) -> dict:
