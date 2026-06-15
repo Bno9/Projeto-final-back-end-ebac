@@ -52,5 +52,4 @@ botao_all_pokeapi.addEventListener("click", () => {
         });
 });
 
-
 // falta todas rotas de criação de pokemon (criar, atualizar, deletar, ver)

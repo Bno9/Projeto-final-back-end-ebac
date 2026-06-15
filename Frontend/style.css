@@ -9,6 +9,10 @@ body {
     color: white;
 }
 
+.dark-mode a {
+    color: white;
+}
+
 .dark-mode button {
     background-color: #444;
     color: white;
@@ -85,4 +89,8 @@ input {
 
 .dark-mode #infopokeapi.info-visible {
     border: 1px solid white;
+}
+
+a {
+    color: black;
 }
