@@ -8,7 +8,6 @@
 </head>
 
 <body>
-
     <!---->
     <header>
         <button id="botao-tema"> 🌙 </button>
@@ -32,6 +31,26 @@
         <div class="imagens">
             <img id="front_img_pokemon">
             <img id="back_img_pokemon"> 
+        </div>
+
+        <div class="pokeapibuttons">
+            <form id="form-pokemon">
+                <label for="nome">Nome</label>
+                <input type="text" name="nome" id="nome" required>
+
+                <label for="altura">Altura</label>
+                <input type="number" name="altura" id="altura" required>
+
+                <label for="peso">Peso</label>
+                <input type="number" name="peso" id="peso" required>
+
+                <label for="tipos">Tipos</label>
+                <textarea name="tipos" id="tipos" required></textarea>
+
+                <label for="level">Level</label>
+                <input type="number" name="level" id="level" required>
+                <button type="submit">CRIAR POKEMON</button>
+            </form>
         </div>
     </main>
 

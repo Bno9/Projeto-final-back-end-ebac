@@ -52,4 +52,32 @@ botao_all_pokeapi.addEventListener("click", () => {
         });
 });
 
-// falta todas rotas de criação de pokemon (criar, atualizar, deletar, ver)
+const form = document.getElementById("form-pokemon");
+
+form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const pokemon = {
+        name: document.getElementById("nome").value,
+        height: Number(document.getElementById("altura").value),
+        weight: Number(document.getElementById("peso").value),
+        types: document
+            .getElementById("tipos")
+            .value
+            .split(",")
+            .map(tipo => tipo.trim()),
+        level: Number(document.getElementById("level").value)
+    };
+
+    const response = await fetch("http://127.0.0.1:8000/criar-pokemon", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(pokemon)
+    });
+
+    const data = await response.json();
+
+    console.log(data);
+});
