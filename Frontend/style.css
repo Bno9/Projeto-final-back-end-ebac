@@ -9,6 +9,10 @@ body {
     color: white;
 }
 
+.dark-mode a {
+    color: white;
+}
+
 .dark-mode button {
     background-color: #444;
     color: white;
@@ -48,8 +52,9 @@ body {
     min-width: auto;
 }
 
-#titlepokeapi {
+h1 {
     text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 .imagens {
@@ -83,6 +88,51 @@ input {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+#info-pokemons {
+    margin: 30px auto;
+    width: 80%;
+    font-size: large;
+    font-family: Arial, Helvetica, sans-serif;
+    max-width: 380px;
+    text-align: center;
+}
+
+#info-pokemons.info-visible {
+    border: 10px solid black;
+}
+
+.dark-mode #info-pokemons {
+    border: 10px solid white;
+    background-color: #333;
+}
+
 .dark-mode #infopokeapi.info-visible {
     border: 1px solid white;
+}
+
+a {
+    color: black;
+}
+
+.form-poke{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    width: 80%;
+    max-width: 300px;
+    margin: 30px 100px;
+}
+
+.forms-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.error-message {
+    color: red;
+    font-size: large;
+    text-align: center;
 }

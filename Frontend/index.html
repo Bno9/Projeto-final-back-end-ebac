@@ -8,29 +8,99 @@
 </head>
 
 <body>
-    <button id="botao-tema"> 🌙 </button>
-    <h1 id="titlepokeapi"> Buscar Pokemons na pokeapi </h1>
+    <!---->
+    <header>
+        <button id="botao-tema"> 🌙 </button>
+        <h1> Buscar Pokemons na pokeapi </h1>
+    </header>
 
-    <div class="pokeapibuttons">
+    <main>
 
-        <button id="btn1">EXIBIR TODA POKEAPI</button>
+        <div class="pokeapibuttons">
+            <button id="btn1">EXIBIR TODA POKEAPI</button>
 
-        <input type="number" id="limit" placeholder="Limite">
-        <input type="number" id="offset" placeholder="Offset">
+            <input type="number" id="limit" placeholder="Limite">
+            <input type="number" id="offset" placeholder="Offset">
 
-        <button id="btn2">PESQUISAR POKEMON</button>
+            <button id="btn2">PESQUISAR POKEMON</button>
 
-        <input type="number" id="id_poke" placeholder="ID do Pokémon">
-    </div>
+            <input type="number" id="id_poke" placeholder="ID do Pokémon">
+        </div>
 
-    <pre id="infopokeapi"></pre>
+        <pre id="infopokeapi"></pre>
 
-    <div class="imagens">
-        
-        <img id="front_img_pokemon">
-        <img id="back_img_pokemon">
+        <div class="imagens">
+            <img id="front_img_pokemon">
+            <img id="back_img_pokemon"> 
+        </div>
 
-    </div>
+        <h1>Opções do usuario</h1>
+
+        <div class="forms-container">
+            <form id="form-pokemon" class="form-poke">
+                <button type="submit">CRIAR POKEMON</button>
+
+                <label for="nome">Nome</label>
+                <input type="text" name="nome" id="nome" placeholder="Charizard" required>
+
+                <label for="altura">Altura</label>
+                <input type="number" name="altura" id="altura" placeholder="390" required>
+
+                <label for="peso">Peso</label>
+                <input type="number" name="peso" id="peso" placeholder="90" required>
+
+                <label for="tipos">Tipos (se tiver mais de 1, utilize virgulas para separar)</label>
+                <input name="tipos" id="tipos" placeholder="fogo, dragão" required></input >
+
+                <label for="level">Level entre 1 e 100</label>
+                <input type="number" name="level" id="level" placeholder="36" required>
+            </form>
+
+            <form id="form-atualizar-pokemon", class="form-poke">
+                <button type="submit">ATUALIZAR POKEMON</button>
+                <input type="text" id="nome-pokemon-att" placeholder="Digite o nome do pokemon que deseja atualizar">
+
+                <label for="nome">Nome</label>
+                <input type="text" name="nome" id="nome-att" placeholder="Charmander" required>
+
+                <label for="altura">Altura</label>
+                <input type="number" name="altura" id="altura-att" placeholder="40" required>
+
+                <label for="peso">Peso</label>
+                <input type="number" name="peso" id="peso-att" placeholder="20" required>
+
+                <label for="tipos">Tipos (se tiver mais de 1, utilize virgulas para separar)</label>
+                <input name="tipos" id="tipos-att" placeholder="fogo" required></input >
+
+                <label for="level">Level entre 1 e 100</label>
+                <input type="number" name="level" id="level-att" placeholder="10" required>
+            </form>
+
+            <form class="form-poke">
+                <button id="botao-deletar">DELETAR POKEMON</button>
+                <input type="text" id="nome-pokemon-delete" placeholder="insira o nome do pokemon que deseja excluir">
+            </form>
+        </div>
+
+        <h1 id="resposta-api"></h1>
+
+        <div class="pokeapibuttons">
+            <button id="get-all-pokemons">VER TODOS POKEMONS</button>
+            <button id="get-pokemon-per-name">PESQUISAR POKEMON POR NOME</button>
+            <input type="text" id="name-get" placeholder="Charizard">
+        </div>
+
+        <pre id="info-pokemons"></pre>
+
+    </main>
+
+    <footer>
+        <p>Veja tambem meus outros projetos:</p>
+        <ul>
+            <li><a href="https://github.com/Bno9/Mini-tibia">Mini tibia</a></li>
+            <li><a href="https://github.com/Bno9/Sistema-adega-do-z-">Sistema comercial de uma adega</a></li>
+        </ul>
+    </footer>
 
     <script src="/Frontend/Projeto.js"></script>
 </body>
