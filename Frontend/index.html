@@ -36,24 +36,46 @@
 
         <h1>Opções do usuario</h1>
 
-        <form id="form-pokemon">
-            <button type="submit">CRIAR POKEMON</button>
+        <div class="forms-container">
+            <form id="form-pokemon" class="form-poke">
+                <button type="submit">CRIAR POKEMON</button>
 
-            <label for="nome">Nome</label>
-            <input type="text" name="nome" id="nome" placeholder="Charizard" required>
+                <label for="nome">Nome</label>
+                <input type="text" name="nome" id="nome" placeholder="Charizard" required>
 
-            <label for="altura">Altura</label>
-            <input type="number" name="altura" id="altura" placeholder="390" required>
+                <label for="altura">Altura</label>
+                <input type="number" name="altura" id="altura" placeholder="390" required>
 
-            <label for="peso">Peso</label>
-            <input type="number" name="peso" id="peso" placeholder="90" required>
+                <label for="peso">Peso</label>
+                <input type="number" name="peso" id="peso" placeholder="90" required>
 
-            <label for="tipos">Tipos (se tiver mais de 1, utilize virgulas para separar)</label>
-            <input name="tipos" id="tipos" placeholder="fogo, dragão" required></input >
+                <label for="tipos">Tipos (se tiver mais de 1, utilize virgulas para separar)</label>
+                <input name="tipos" id="tipos" placeholder="fogo, dragão" required></input >
 
-            <label for="level">Level entre 1 e 100</label>
-            <input type="number" name="level" id="level" placeholder="36" required>
-        </form>
+                <label for="level">Level entre 1 e 100</label>
+                <input type="number" name="level" id="level" placeholder="36" required>
+            </form>
+
+            <form id="form-atualizar-pokemon", class="form-poke">
+                <button type="submit">ATUALIZAR POKEMON</button>
+                <input type="text" id="nome-pokemon-att" placeholder="Digite o nome do pokemon que deseja atualizar">
+
+                <label for="nome">Nome</label>
+                <input type="text" name="nome" id="nome-att" placeholder="Charmander" required>
+
+                <label for="altura">Altura</label>
+                <input type="number" name="altura" id="altura-att" placeholder="40" required>
+
+                <label for="peso">Peso</label>
+                <input type="number" name="peso" id="peso-att" placeholder="20" required>
+
+                <label for="tipos">Tipos (se tiver mais de 1, utilize virgulas para separar)</label>
+                <input name="tipos" id="tipos-att" placeholder="fogo" required></input >
+
+                <label for="level">Level entre 1 e 100</label>
+                <input type="number" name="level" id="level-att" placeholder="10" required>
+            </form>
+        </div>
 
         <div class="pokeapibuttons">
             <button id="get-all-pokemons">VER TODOS POKEMONS</button>

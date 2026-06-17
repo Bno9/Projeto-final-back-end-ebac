@@ -114,12 +114,19 @@ a {
     color: black;
 }
 
-#form-pokemon {
+.form-poke{
     display: flex;
     flex-direction: column;
     gap: 10px;
 
     width: 80%;
     max-width: 300px;
-    margin: 30px auto;
+    margin: 30px 100px;
+}
+
+.forms-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    align-items: flex-start;
 }

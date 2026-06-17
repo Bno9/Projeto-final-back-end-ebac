@@ -110,3 +110,35 @@ botao_ver_pokemons_por_nome.addEventListener("click", () => {
             info_pokemons.classList.add("info-visible");
         });
 })
+
+form_att = document.getElementById("form-atualizar-pokemon")
+
+form_att.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const old_name = document.getElementById("nome-pokemon-att")
+
+    const pokemon = {
+        name: document.getElementById("nome-att").value,
+        height: Number(document.getElementById("altura-att").value),
+        weight: Number(document.getElementById("peso-att").value),
+        types: document
+            .getElementById("tipos-att")
+            .value
+            .split(",")
+            .map(tipo => tipo.trim()),
+        level: Number(document.getElementById("level-att").value)
+    };
+
+    const response = await fetch(`https://projeto-final-back-end-ebac.onrender.com/atualizar-pokemon/${old_name.value}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(pokemon)
+    });
+
+    const data = await response.json();
+
+    console.log(data);
+});
