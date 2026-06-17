@@ -9,6 +9,7 @@ const botao_tema = document.getElementById("botao-tema");
 const body = document.body;
 const botao_ver_pokemons_criados_pelo_usuario = document.getElementById("get-all-pokemons")
 const botao_ver_pokemons_por_nome = document.getElementById("get-pokemon-per-name")
+const botao_deletar = document.getElementById("botao-deletar")
 
 botao_tema.addEventListener("click", () => {
     body.classList.toggle("dark-mode")
@@ -136,6 +137,23 @@ form_att.addEventListener("submit", async (event) => {
             "Content-Type": "application/json"
         },
         body: JSON.stringify(pokemon)
+    });
+
+    const data = await response.json();
+
+    console.log(data);
+});
+
+botao_deletar.addEventListener("click", async (event) => {
+    event.preventDefault();
+
+    const name = document.getElementById("nome-pokemon-delete")
+
+    const response = await fetch(`https://projeto-final-back-end-ebac.onrender.com/deletar-pokemon/${name.value}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json"
+        }
     });
 
     const data = await response.json();
