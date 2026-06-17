@@ -1,162 +1,266 @@
 const botao_all_pokeapi = document.getElementById("btn1");
 const botao_pokeapi_id = document.getElementById("btn2");
-const info_pokemons = document.getElementById("info-pokemons")
+const info_pokemons = document.getElementById("info-pokemons");
 const infopokeapi = document.getElementById("infopokeapi");
 const id_pokeapi = document.getElementById("id_poke");
 const front = document.getElementById("front_img_pokemon");
 const back = document.getElementById("back_img_pokemon");
 const botao_tema = document.getElementById("botao-tema");
 const body = document.body;
-const botao_ver_pokemons_criados_pelo_usuario = document.getElementById("get-all-pokemons")
-const botao_ver_pokemons_por_nome = document.getElementById("get-pokemon-per-name")
-const botao_deletar = document.getElementById("botao-deletar")
+const botao_ver_pokemons_criados_pelo_usuario = document.getElementById("get-all-pokemons");
+const botao_ver_pokemons_por_nome = document.getElementById("get-pokemon-per-name");
+const botao_deletar = document.getElementById("botao-deletar");
+const resposta_api = document.getElementById("resposta-api");
+const form = document.getElementById("form-pokemon");
+const form_att = document.getElementById("form-atualizar-pokemon");
 
+//botão pra alterar tema do navegador
 botao_tema.addEventListener("click", () => {
-    body.classList.toggle("dark-mode")
+    body.classList.toggle("dark-mode");
 })
 
-botao_pokeapi_id.addEventListener("click", () => {
-    const id = Number(id_pokeapi.value);
+//botão que pesquisa um pokemon por id na pokeapi
+botao_pokeapi_id.addEventListener("click", async () => {
+    try {
+        const id = Number(id_pokeapi.value);
 
-    if(id <= 0){
-        return;
+        if (id <= 0) {
+            throw new Error("ID inválido");
         }
 
-    fetch(`https://projeto-final-back-end-ebac.onrender.com/pokeapi/${id}`)
-        .then(response => response.json())
-        .then(data => {
-            infopokeapi.textContent = JSON.stringify(data, null, 2);
-            infopokeapi.classList.add("info-visible");
-            front.src = data.sprites.front_default;
-            back.src = data.sprites.back_default;
-            front.style.display = "block";
-            back.style.display = "block";
-        });
-});
+        const response = await fetch(
+            `https://projeto-final-back-end-ebac.onrender.com/pokeapi/${id}`
+        );
 
-botao_all_pokeapi.addEventListener("click", () => {
+        const data = await response.json();
 
-    const limit = document.getElementById("limit");
-    const offset = document.getElementById("offset");
+        if (!response.ok) {
+            throw new Error(data.detail || "Erro ao buscar Pokémon");
+        }
 
-    if(limit.value <= 0 || offset < 0){
-        infopokeapi.textContent = "Insira um valor maior que 0 para limite e offset"
-        return
+        infopokeapi.textContent = JSON.stringify(data, null, 2);
+        infopokeapi.classList.add("info-visible");
+        infopokeapi.classList.remove("error-message")
+
+        front.src = data.sprites.front_default;
+        back.src = data.sprites.back_default;
+
+        front.style.display = "block";
+        back.style.display = "block";
+
+    } catch (error) {
+        infopokeapi.textContent = error.message;
+        infopokeapi.classList.add("error-message");
     }
-
-    fetch(`https://projeto-final-back-end-ebac.onrender.com/pokeapi/all?limit=${limit.value}&offset=${offset.value}`)
-        .then(response => response.json())
-        .then(data => { 
-            infopokeapi.textContent = JSON.stringify(data, null, 2);
-            infopokeapi.classList.add("info-visible");
-            front.style.display = "none";
-            back.style.display = "none";
-
-        });
 });
 
-const form = document.getElementById("form-pokemon");
+//botão que pesquisa toda pokeapi utilizando limit e offset
+botao_all_pokeapi.addEventListener("click", async () => {
+    try {
+        const limit = document.getElementById("limit");
+        const offset = document.getElementById("offset");
 
+        if (Number(limit.value) <= 0 || Number(offset.value) < 0) {
+            throw new Error("Limite ou offset inválidos");
+        }
+
+        const response = await fetch(
+            `https://projeto-final-back-end-ebac.onrender.com/pokeapi/all?limit=${limit.value}&offset=${offset.value}`
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Erro na API");
+        }
+
+        infopokeapi.textContent = JSON.stringify(data, null, 2);
+        infopokeapi.classList.add("info-visible");
+        infopokeapi.classList.remove("error-message")
+        front.style.display = "none";
+        back.style.display = "none";
+
+    } catch (error) {
+        infopokeapi.textContent = error.message;
+        infopokeapi.classList.add("error-message")
+    }
+});
+
+//formulario de criação de pokemon
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
+    try{
+        const pokemon = {
+            name: document.getElementById("nome").value,
+            height: Number(document.getElementById("altura").value),
+            weight: Number(document.getElementById("peso").value),
+            types: document
+                .getElementById("tipos")
+                .value
+                .split(",")
+                .map(tipo => tipo.trim()),
+            level: Number(document.getElementById("level").value)
+        };
 
-    const pokemon = {
-        name: document.getElementById("nome").value,
-        height: Number(document.getElementById("altura").value),
-        weight: Number(document.getElementById("peso").value),
-        types: document
-            .getElementById("tipos")
-            .value
-            .split(",")
-            .map(tipo => tipo.trim()),
-        level: Number(document.getElementById("level").value)
-    };
+        const response = await fetch("https://projeto-final-back-end-ebac.onrender.com/criar-pokemon", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(pokemon)
+        });
 
-    const response = await fetch("https://projeto-final-back-end-ebac.onrender.com/criar-pokemon", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(pokemon)
-    });
+        const data = await response.json();
 
-    const data = await response.json();
+        if(!response.ok){
+            throw new Error(data.detail)
+        }
 
-    console.log(data);
+        resposta_api.textContent = data.message;
+        resposta_api.classList.remove("error-message")
+        
+    } catch(error) {
+        resposta_api.textContent = error.message;
+        resposta_api.classList.add("error-message")
+    }
 });
 
-botao_ver_pokemons_criados_pelo_usuario.addEventListener("click", () => {
+//botão para ver pokemons criados pelo usuario
+botao_ver_pokemons_criados_pelo_usuario.addEventListener("click", async () => {
+    try {
+        const response = await fetch(
+            "https://projeto-final-back-end-ebac.onrender.com/pokemons"
+        );
 
-    fetch(`https://projeto-final-back-end-ebac.onrender.com/pokemons`)
-        .then(response => response.json())
-        .then(data => {
-            info_pokemons.textContent = JSON.stringify(data, null, 2);
-            info_pokemons.classList.add("info-visible")
-        });
-})
+        const data = await response.json();
 
-botao_ver_pokemons_por_nome.addEventListener("click", () => {
+        if (!response.ok) {
+            throw new Error(data.detail || "Erro ao buscar pokémons");
+        }
 
-    const name = document.getElementById("name-get")
+        info_pokemons.textContent = JSON.stringify(data, null, 2);
+        info_pokemons.classList.add("info-visible");
 
-    fetch(`https://projeto-final-back-end-ebac.onrender.com/pokemon/${name.value}`)
-        .then(response => response.json())
-        .then(data => {
-            info_pokemons.innerHTML = `<h2>${data.name}</h2>
-                <p><strong>Altura:</strong> ${data.height}</p>
-                <p><strong>Peso:</strong> ${data.weight}</p>
-                <p><strong>Level:</strong> ${data.level}</p>
-                <p><strong>Tipos:</strong> ${data.types.join(", ")}</p>
-            `;
-            info_pokemons.classList.add("info-visible");
-        });
-})
+    } catch (error) {
+        info_pokemons.textContent = error.message;
+        info_pokemons.classList.add("error-message");
+    }
+}); 
 
-form_att = document.getElementById("form-atualizar-pokemon")
+// botão para ver pokémons criados através do nome
+botao_ver_pokemons_por_nome.addEventListener("click", async () => {
+    try {
+        const name = document.getElementById("name-get");
 
+        console.log(name.value)
+
+        if(!name.value){
+            throw new Error("Digite o nome do pokemon que deseja ver")
+        }
+
+        const response = await fetch(
+            `https://projeto-final-back-end-ebac.onrender.com/pokemon/${name.value}`
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Erro ao buscar Pokémon");
+        }
+
+        info_pokemons.innerHTML = `
+            <h2>${data.name}</h2>
+            <p><strong>Altura:</strong> ${data.height}</p>
+            <p><strong>Peso:</strong> ${data.weight}</p>
+            <p><strong>Level:</strong> ${data.level}</p>
+            <p><strong>Tipos:</strong> ${data.types.join(", ")}</p>
+        `;
+
+        info_pokemons.classList.add("info-visible");
+        info_pokemons.classList.remove("error-message")
+
+    } catch (error) {
+        info_pokemons.textContent = error.message;
+        info_pokemons.classList.add("error-message");
+    }
+});
+
+//formulario de atualização de pokemons
 form_att.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const old_name = document.getElementById("nome-pokemon-att")
-
-    const pokemon = {
-        name: document.getElementById("nome-att").value,
-        height: Number(document.getElementById("altura-att").value),
-        weight: Number(document.getElementById("peso-att").value),
-        types: document
-            .getElementById("tipos-att")
+    try {
+        const old_name = document
+            .getElementById("nome-pokemon-att")
             .value
-            .split(",")
-            .map(tipo => tipo.trim()),
-        level: Number(document.getElementById("level-att").value)
-    };
+            .trim();
 
-    const response = await fetch(`https://projeto-final-back-end-ebac.onrender.com/atualizar-pokemon/${old_name.value}`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(pokemon)
-    });
+        if (!old_name) {
+            throw new Error("Digite o nome do Pokémon que deseja atualizar");
+        }
 
-    const data = await response.json();
+        const pokemon = {
+            name: document.getElementById("nome-att").value,
+            height: Number(document.getElementById("altura-att").value),
+            weight: Number(document.getElementById("peso-att").value),
+            types: document
+                .getElementById("tipos-att")
+                .value
+                .split(",")
+                .map(tipo => tipo.trim()),
+            level: Number(document.getElementById("level-att").value)
+        };
 
-    console.log(data);
+        const response = await fetch(
+            `https://projeto-final-back-end-ebac.onrender.com/atualizar-pokemon/${old_name}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(pokemon)
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Erro ao atualizar Pokémon");
+        }
+
+        info_pokemons.textContent = data.message;
+        info_pokemons.className = "success-message";
+
+    } catch (error) {
+        info_pokemons.textContent = error.message;
+        info_pokemons.className = "error-message";
+    }
 });
 
+//botão para deletar um pokemon
 botao_deletar.addEventListener("click", async (event) => {
     event.preventDefault();
 
-    const name = document.getElementById("nome-pokemon-delete")
+    try {
+        const name = document.getElementById("nome-pokemon-delete")
+        const response = await fetch(`https://projeto-final-back-end-ebac.onrender.com/deletar-pokemon/${name.value}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
 
-    const response = await fetch(`https://projeto-final-back-end-ebac.onrender.com/deletar-pokemon/${name.value}`, {
-        method: "DELETE",
-        headers: {
-            "Content-Type": "application/json"
+        const data = await response.json();
+
+    if (!response.ok) {
+            throw new Error(data.detail || "Erro ao deletar Pokémon");
         }
-    });
 
-    const data = await response.json();
+        resposta_api.textContent = data.message;
+        resposta_api.style.color = "green";
 
-    console.log(data);
+    } catch (error) {
+        resposta_api.textContent = error.message;
+        resposta_api.style.color = "red";
+    }
 });
