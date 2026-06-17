@@ -1,12 +1,14 @@
 const botao_all_pokeapi = document.getElementById("btn1");
 const botao_pokeapi_id = document.getElementById("btn2");
+const info_pokemons = document.getElementById("info-pokemons")
 const infopokeapi = document.getElementById("infopokeapi");
 const id_pokeapi = document.getElementById("id_poke");
 const front = document.getElementById("front_img_pokemon");
 const back = document.getElementById("back_img_pokemon");
 const botao_tema = document.getElementById("botao-tema");
 const body = document.body;
-
+const botao_ver_pokemons_criados_pelo_usuario = document.getElementById("get-all-pokemons")
+const botao_ver_pokemons_por_nome = document.getElementById("get-pokemon-per-name")
 
 botao_tema.addEventListener("click", () => {
     body.classList.toggle("dark-mode")
@@ -69,7 +71,7 @@ form.addEventListener("submit", async (event) => {
         level: Number(document.getElementById("level").value)
     };
 
-    const response = await fetch("http://127.0.0.1:8000/criar-pokemon", {
+    const response = await fetch("https://projeto-final-back-end-ebac.onrender.com/criar-pokemon", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -81,3 +83,30 @@ form.addEventListener("submit", async (event) => {
 
     console.log(data);
 });
+
+botao_ver_pokemons_criados_pelo_usuario.addEventListener("click", () => {
+
+    fetch(`https://projeto-final-back-end-ebac.onrender.com/pokemons`)
+        .then(response => response.json())
+        .then(data => {
+            info_pokemons.textContent = JSON.stringify(data, null, 2);
+            info_pokemons.classList.add("info-visible")
+        });
+})
+
+botao_ver_pokemons_por_nome.addEventListener("click", () => {
+
+    const name = document.getElementById("name-get")
+
+    fetch(`https://projeto-final-back-end-ebac.onrender.com/pokemon/${name.value}`)
+        .then(response => response.json())
+        .then(data => {
+            info_pokemons.innerHTML = `<h2>${data.name}</h2>
+                <p><strong>Altura:</strong> ${data.height}</p>
+                <p><strong>Peso:</strong> ${data.weight}</p>
+                <p><strong>Level:</strong> ${data.level}</p>
+                <p><strong>Tipos:</strong> ${data.types.join(", ")}</p>
+            `;
+            info_pokemons.classList.add("info-visible");
+        });
+})
