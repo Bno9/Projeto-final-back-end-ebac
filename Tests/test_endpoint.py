@@ -125,13 +125,13 @@ def test_endpoint_criar_pokemon_ja_existente(charmander, fake_db):
 
 def test_endpoint_atualizar_pokemon(charmander, squirtle, fake_db):
 
-    fake_db.query.return_value.filter_by.return_value.first.return_value = PokemonDB(
+    fake_db.query.return_value.filter_by.return_value.first.side_effect = [PokemonDB(
         name=charmander["name"],
         height=charmander["height"],
         weight=charmander["weight"],
         types=charmander["types"],
         level=charmander["level"]
-    )
+    ), None]
 
     response = client.put(f"/atualizar-pokemon/{charmander['name']}", json=squirtle)
 
