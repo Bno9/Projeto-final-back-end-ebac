@@ -64,6 +64,13 @@ def update_pokemon(old_name: str, pokemon: Pokemon, Db=Depends(get_db)) -> dict:
             status_code=404,
             detail=f"O pokemon {old_name} não foi encontrado no banco de dados")
     
+    pokemon_nome = Db.query(PokemonDB).filter_by(name=pokemon.name).first()
+    if pokemon_nome:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Já existe um pokemon com o nome {pokemon.name}"
+        )
+    
     pokemondb.name = pokemon.name
     pokemondb.height = pokemon.height
     pokemondb.weight = pokemon.weight

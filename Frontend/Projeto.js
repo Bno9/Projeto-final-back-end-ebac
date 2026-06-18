@@ -176,7 +176,7 @@ botao_ver_pokemons_por_nome.addEventListener("click", async () => {
             <p><strong>Tipos:</strong> ${data.types.join(", ")}</p>
         `;
 
-        info_pokemons.classList.add("info-visible");
+        info_pokemons.classList.add("info-visible"); // mudar esses coisas pro respostas_api
         info_pokemons.classList.remove("error-message")
 
     } catch (error) {
@@ -228,12 +228,12 @@ form_att.addEventListener("submit", async (event) => {
             throw new Error(data.detail || "Erro ao atualizar Pokémon");
         }
 
-        info_pokemons.textContent = data.message;
-        info_pokemons.className = "success-message";
+        resposta_api.textContent = data.message;
+        resposta_api.className = "success-message";
 
     } catch (error) {
-        info_pokemons.textContent = error.message;
-        info_pokemons.className = "error-message";
+        resposta_api.textContent = error.message;
+        resposta_api.className = "error-message";
     }
 });
 
