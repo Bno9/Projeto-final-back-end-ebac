@@ -125,6 +125,87 @@ form.addEventListener("submit", async (event) => {
     }
 });
 
+
+//formulario de atualização de pokemons
+form_att.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    try {
+        const old_name = document
+            .getElementById("nome-pokemon-att")
+            .value
+            .trim();
+
+        if (!old_name) {
+            throw new Error("Digite o nome do Pokémon que deseja atualizar");
+        }
+
+        const pokemon = {
+            name: document.getElementById("nome-att").value,
+            height: Number(document.getElementById("altura-att").value),
+            weight: Number(document.getElementById("peso-att").value),
+            types: document
+                .getElementById("tipos-att")
+                .value
+                .split(",")
+                .map(tipo => tipo.trim()),
+            level: Number(document.getElementById("level-att").value)
+        };
+
+        const response = await fetch(
+            `https://projeto-final-back-end-ebac.onrender.com/atualizar-pokemon/${old_name}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(pokemon)
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Erro ao atualizar Pokémon");
+        }
+
+        resposta_api.textContent = data.message;
+        resposta_api.className = "success-message";
+
+    } catch (error) {
+        resposta_api.textContent = error.message;
+        resposta_api.className = "error-message";
+    }
+});
+
+//botão para deletar um pokemon
+botao_deletar.addEventListener("click", async (event) => {
+    event.preventDefault();
+
+    try {
+        const name = document.getElementById("nome-pokemon-delete")
+        const response = await fetch(`https://projeto-final-back-end-ebac.onrender.com/deletar-pokemon/${name.value}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        const data = await response.json();
+
+    if (!response.ok) {
+            throw new Error(data.detail || "Erro ao deletar Pokémon");
+        }
+
+        resposta_api.textContent = data.message;
+        resposta_api.style.color = "green";
+
+    } catch (error) {
+        resposta_api.textContent = error.message;
+        resposta_api.style.color = "red";
+    }
+});
+
 //botão para ver pokemons criados pelo usuario
 botao_ver_pokemons_criados_pelo_usuario.addEventListener("click", async () => {
     try {
@@ -177,90 +258,10 @@ botao_ver_pokemons_por_nome.addEventListener("click", async () => {
         `;
 
         info_pokemons.classList.add("info-visible");
-        info_pokemons.classList.remove("error-message")
+        info_pokemons.classList.remove("error-message");
 
     } catch (error) {
         info_pokemons.textContent = error.message;
         info_pokemons.classList.add("error-message");
-    }
-});
-
-//formulario de atualização de pokemons
-form_att.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    try {
-        const old_name = document
-            .getElementById("nome-pokemon-att")
-            .value
-            .trim();
-
-        if (!old_name) {
-            throw new Error("Digite o nome do Pokémon que deseja atualizar");
-        }
-
-        const pokemon = {
-            name: document.getElementById("nome-att").value,
-            height: Number(document.getElementById("altura-att").value),
-            weight: Number(document.getElementById("peso-att").value),
-            types: document
-                .getElementById("tipos-att")
-                .value
-                .split(",")
-                .map(tipo => tipo.trim()),
-            level: Number(document.getElementById("level-att").value)
-        };
-
-        const response = await fetch(
-            `https://projeto-final-back-end-ebac.onrender.com/atualizar-pokemon/${old_name}`,
-            {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(pokemon)
-            }
-        );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.detail || "Erro ao atualizar Pokémon");
-        }
-
-        info_pokemons.textContent = data.message;
-        info_pokemons.className = "success-message";
-
-    } catch (error) {
-        info_pokemons.textContent = error.message;
-        info_pokemons.className = "error-message";
-    }
-});
-
-//botão para deletar um pokemon
-botao_deletar.addEventListener("click", async (event) => {
-    event.preventDefault();
-
-    try {
-        const name = document.getElementById("nome-pokemon-delete")
-        const response = await fetch(`https://projeto-final-back-end-ebac.onrender.com/deletar-pokemon/${name.value}`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
-
-        const data = await response.json();
-
-    if (!response.ok) {
-            throw new Error(data.detail || "Erro ao deletar Pokémon");
-        }
-
-        resposta_api.textContent = data.message;
-        resposta_api.style.color = "green";
-
-    } catch (error) {
-        resposta_api.textContent = error.message;
-        resposta_api.style.color = "red";
     }
 });
