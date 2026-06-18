@@ -125,65 +125,6 @@ form.addEventListener("submit", async (event) => {
     }
 });
 
-//botão para ver pokemons criados pelo usuario
-botao_ver_pokemons_criados_pelo_usuario.addEventListener("click", async () => {
-    try {
-        const response = await fetch(
-            "https://projeto-final-back-end-ebac.onrender.com/pokemons"
-        );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.detail || "Erro ao buscar pokémons");
-        }
-
-        info_pokemons.textContent = JSON.stringify(data, null, 2);
-        info_pokemons.classList.add("info-visible");
-
-    } catch (error) {
-        info_pokemons.textContent = error.message;
-        info_pokemons.classList.add("error-message");
-    }
-}); 
-
-// botão para ver pokémons criados através do nome
-botao_ver_pokemons_por_nome.addEventListener("click", async () => {
-    try {
-        const name = document.getElementById("name-get");
-
-        console.log(name.value)
-
-        if(!name.value){
-            throw new Error("Digite o nome do pokemon que deseja ver")
-        }
-
-        const response = await fetch(
-            `https://projeto-final-back-end-ebac.onrender.com/pokemon/${name.value}`
-        );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.detail || "Erro ao buscar Pokémon");
-        }
-
-        info_pokemons.innerHTML = `
-            <h2>${data.name}</h2>
-            <p><strong>Altura:</strong> ${data.height}</p>
-            <p><strong>Peso:</strong> ${data.weight}</p>
-            <p><strong>Level:</strong> ${data.level}</p>
-            <p><strong>Tipos:</strong> ${data.types.join(", ")}</p>
-        `;
-
-        info_pokemons.classList.add("info-visible"); // mudar esses coisas pro respostas_api
-        info_pokemons.classList.remove("error-message")
-
-    } catch (error) {
-        info_pokemons.textContent = error.message;
-        info_pokemons.classList.add("error-message");
-    }
-});
 
 //formulario de atualização de pokemons
 form_att.addEventListener("submit", async (event) => {
@@ -262,5 +203,65 @@ botao_deletar.addEventListener("click", async (event) => {
     } catch (error) {
         resposta_api.textContent = error.message;
         resposta_api.style.color = "red";
+    }
+});
+
+//botão para ver pokemons criados pelo usuario
+botao_ver_pokemons_criados_pelo_usuario.addEventListener("click", async () => {
+    try {
+        const response = await fetch(
+            "https://projeto-final-back-end-ebac.onrender.com/pokemons"
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Erro ao buscar pokémons");
+        }
+
+        info_pokemons.textContent = JSON.stringify(data, null, 2);
+        info_pokemons.classList.add("info-visible");
+
+    } catch (error) {
+        info_pokemons.textContent = error.message;
+        info_pokemons.classList.add("error-message");
+    }
+}); 
+
+// botão para ver pokémons criados através do nome
+botao_ver_pokemons_por_nome.addEventListener("click", async () => {
+    try {
+        const name = document.getElementById("name-get");
+
+        console.log(name.value)
+
+        if(!name.value){
+            throw new Error("Digite o nome do pokemon que deseja ver")
+        }
+
+        const response = await fetch(
+            `https://projeto-final-back-end-ebac.onrender.com/pokemon/${name.value}`
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Erro ao buscar Pokémon");
+        }
+
+        info_pokemons.innerHTML = `
+            <h2>${data.name}</h2>
+            <p><strong>Altura:</strong> ${data.height}</p>
+            <p><strong>Peso:</strong> ${data.weight}</p>
+            <p><strong>Level:</strong> ${data.level}</p>
+            <p><strong>Tipos:</strong> ${data.types.join(", ")}</p>
+        `;
+
+        info_pokemons.classList.add("info-visible");
+        info_pokemons.classList.remove("error-message");
+
+    } catch (error) {
+        info_pokemons.textContent = error.message;
+        info_pokemons.classList.add("error-message");
     }
 });
